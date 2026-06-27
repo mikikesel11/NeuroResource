@@ -54,5 +54,25 @@ export function savePreferences(update) {
   return next;
 }
 
+// Convenience API exposed to the accessibility widget (see public-layout).
+const TEXT_MIN = 0.85;
+const TEXT_MAX = 1.6;
+
+window.nsPrefs = {
+  load: loadPreferences,
+  apply: applyPreferences,
+  save: savePreferences,
+  setTheme: (theme) => savePreferences({ theme }), // pass null to follow OS
+  toggleMotion: () => savePreferences({ reduceMotion: !loadPreferences().reduceMotion }),
+  adjustText: (delta) => {
+    const next = +(loadPreferences().textScale + delta).toFixed(2);
+    return savePreferences({ textScale: Math.min(TEXT_MAX, Math.max(TEXT_MIN, next)) });
+  },
+  reset: () => {
+    localStorage.removeItem('ns:preferences');
+    applyPreferences();
+  },
+};
+
 // Apply as early as possible on load.
 applyPreferences();

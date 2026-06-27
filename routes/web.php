@@ -2,7 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+// Public site
+Route::view('/', 'home')->name('home');
+
+// Nav destinations built incrementally — placeholders so links never 404.
+Route::view('/shop', 'coming-soon', ['heading' => 'The Shop'])->name('shop');
+Route::view('/blog', 'coming-soon', ['heading' => 'The Blog'])->name('blog');
+Route::view('/resources', 'coming-soon', ['heading' => 'Resource Library'])->name('resources');
+Route::view('/about', 'coming-soon', ['heading' => 'About'])->name('about');
+Route::view('/play', 'coming-soon', ['heading' => 'The Adventure'])->name('play');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
