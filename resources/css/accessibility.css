@@ -99,6 +99,19 @@ html[data-reduce-motion="true"] * {
   }
 }
 
+/* Selected state for the Display & Accessibility options. Combines an accent
+   fill with a leading checkmark so selection is never conveyed by color alone
+   (WCAG 1.4.1). aria-pressed is the source of truth, set by preferences.js. */
+.ns-pref-option[aria-pressed="true"] {
+  background: var(--ns-accent);
+  color: var(--ns-accent-contrast);
+  border-color: var(--ns-accent);
+  font-weight: 600;
+}
+.ns-pref-option[aria-pressed="true"]::before {
+  content: "✓ ";
+}
+
 /* Skip link: hidden until focused. */
 .ns-skip-link {
   position: absolute;

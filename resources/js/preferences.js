@@ -13,6 +13,13 @@
 
 const STORAGE_KEY = 'ns:preferences';
 
+const THEME_LABELS = {
+  light: 'Light',
+  dark: 'Dark',
+  'high-contrast': 'High Contrast',
+  'low-stimulation': 'Low Stimulation',
+};
+
 const DEFAULTS = {
   theme: null, // null => follow OS (prefers-color-scheme)
   textScale: 1,
@@ -45,6 +52,38 @@ export function applyPreferences(prefs = loadPreferences()) {
   root.style.setProperty('--ns-text-scale', String(prefs.textScale));
   root.style.setProperty('--ns-line-height', String(prefs.lineHeight));
   root.style.setProperty('--ns-letter-spacing', `${prefs.letterSpacing}em`);
+
+  // Reflect the active selections back into the widget (if present on the page).
+  syncWidget(prefs, theme, reduceMotion);
+}
+
+/**
+ * Mirror the current preferences into the Display & Accessibility widget so the
+ * user can see what is selected. Sets aria-pressed for assistive tech and lets
+ * CSS add a visible checkmark (a non-color indicator, per WCAG 1.4.1).
+ */
+function syncWidget(prefs, effectiveTheme, effectiveMotion) {
+  if (typeof document === 'undefined') return;
+
+  document.querySelectorAll('[data-ns-theme]').forEach((btn) => {
+    btn.setAttribute('aria-pressed', prefs.theme === btn.dataset.nsTheme ? 'true' : 'false');
+  });
+
+  document.querySelectorAll('[data-ns-action="follow-system"]').forEach((btn) => {
+    btn.setAttribute('aria-pressed', prefs.theme == null ? 'true' : 'false');
+  });
+
+  document.querySelectorAll('[data-ns-effective-theme]').forEach((el) => {
+    el.textContent = THEME_LABELS[effectiveTheme] ?? effectiveTheme;
+  });
+
+  document.querySelectorAll('[data-ns-motion]').forEach((btn) => {
+    btn.setAttribute('aria-pressed', effectiveMotion ? 'true' : 'false');
+  });
+
+  document.querySelectorAll('[data-ns-text-display]').forEach((el) => {
+    el.textContent = `${Math.round(prefs.textScale * 100)}%`;
+  });
 }
 
 export function savePreferences(update) {
@@ -76,3 +115,6 @@ window.nsPrefs = {
 
 // Apply as early as possible on load.
 applyPreferences();
+
+// Re-apply after Livewire SPA navigation swaps in a fresh widget instance.
+document.addEventListener('livewire:navigated', () => applyPreferences());
