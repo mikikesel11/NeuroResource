@@ -1,14 +1,19 @@
 <?php
 
 use App\Domains\Profile\Http\Controllers\AboutController;
+use App\Livewire\Shop\Catalog;
+use App\Livewire\Shop\ProductPage;
 use Illuminate\Support\Facades\Route;
 
 // Public site
 Route::view('/', 'home')->name('home');
 Route::get('/about', AboutController::class)->name('about');
 
+// Shop (headless Shopify — see ProductCatalog binding)
+Route::get('/shop', Catalog::class)->name('shop');
+Route::get('/shop/{handle}', ProductPage::class)->name('shop.product');
+
 // Nav destinations built incrementally — placeholders so links never 404.
-Route::view('/shop', 'coming-soon', ['heading' => 'The Shop'])->name('shop');
 Route::view('/blog', 'coming-soon', ['heading' => 'The Blog'])->name('blog');
 Route::view('/resources', 'coming-soon', ['heading' => 'Resource Library'])->name('resources');
 Route::view('/play', 'coming-soon', ['heading' => 'The Adventure'])->name('play');

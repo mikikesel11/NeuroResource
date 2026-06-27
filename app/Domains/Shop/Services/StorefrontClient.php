@@ -78,7 +78,9 @@ class StorefrontClient
     {
         $response = $this->request()->post('', [
             'query' => $query,
-            'variables' => (object) $variables,
+            // A non-empty assoc array already encodes as a JSON object; only an
+            // empty one needs coercing so GraphQL receives {} rather than [].
+            'variables' => $variables === [] ? new \stdClass : $variables,
         ]);
 
         $response->throw();
