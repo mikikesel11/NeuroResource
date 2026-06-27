@@ -1,15 +1,16 @@
 <?php
 
+use App\Domains\Profile\Http\Controllers\AboutController;
 use Illuminate\Support\Facades\Route;
 
 // Public site
 Route::view('/', 'home')->name('home');
+Route::get('/about', AboutController::class)->name('about');
 
 // Nav destinations built incrementally — placeholders so links never 404.
 Route::view('/shop', 'coming-soon', ['heading' => 'The Shop'])->name('shop');
 Route::view('/blog', 'coming-soon', ['heading' => 'The Blog'])->name('blog');
 Route::view('/resources', 'coming-soon', ['heading' => 'Resource Library'])->name('resources');
-Route::view('/about', 'coming-soon', ['heading' => 'About'])->name('about');
 Route::view('/play', 'coming-soon', ['heading' => 'The Adventure'])->name('play');
 
 Route::view('dashboard', 'dashboard')

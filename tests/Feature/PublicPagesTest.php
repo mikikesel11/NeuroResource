@@ -2,10 +2,15 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
 {
+    // The /about route queries the database; provide a clean schema so it
+    // renders its empty state (no Profile) rather than erroring.
+    use RefreshDatabase;
+
     public function test_home_page_renders_with_tagline_and_accessibility_shell(): void
     {
         $response = $this->get('/');
