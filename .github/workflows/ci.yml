@@ -20,7 +20,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.3', '8.4'] # floor of composer constraint + current stable
+        # Effective floor is 8.4: the locked Symfony 8.x components require
+        # PHP >= 8.4.1. 8.5 matches the development/production runtime.
+        php: ['8.4', '8.5']
     steps:
       - uses: actions/checkout@v5
 
