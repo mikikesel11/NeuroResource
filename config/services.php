@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    // Headless Shopify (Storefront API). Catalog + cart render on our site;
+    // checkout hands off to Shopify. See docs/system-design.md §3.1.
+    'shopify' => [
+        'storefront_domain' => env('SHOPIFY_STOREFRONT_DOMAIN'), // e.g. neuroscouts.myshopify.com
+        'storefront_token' => env('SHOPIFY_STOREFRONT_TOKEN'),   // public Storefront access token
+        'api_version' => env('SHOPIFY_API_VERSION', '2025-07'),
+        'cache_ttl' => (int) env('SHOPIFY_CACHE_TTL', 600),
+        'webhook_secret' => env('SHOPIFY_WEBHOOK_SECRET'),       // HMAC verification
+    ],
+
+    // Plausible — cookieless analytics, no consent banner. See §11.
+    'plausible' => [
+        'domain' => env('PLAUSIBLE_DOMAIN'),                     // e.g. neuroscouts.org
+        'src' => env('PLAUSIBLE_SRC', 'https://plausible.io/js/script.js'),
+    ],
+
 ];
