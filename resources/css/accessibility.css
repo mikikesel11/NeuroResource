@@ -1,0 +1,114 @@
+/*
+ | NeuroScouts — Accessibility theme tokens.
+ |
+ | Four user-selectable themes driven by a data-theme attribute on <html>,
+ | plus user controls for text size, spacing, and motion. Tokens are plain CSS
+ | custom properties so they work regardless of the CSS framework in use.
+ | See docs/system-design.md §3.5 and §7.
+ |
+ | First visit honors the OS: prefers-color-scheme picks light/dark and
+ | prefers-reduced-motion disables transitions until the user overrides.
+ */
+
+:root {
+  /* Light (default) */
+  --ns-bg: #ffffff;
+  --ns-surface: #f6f7f9;
+  --ns-text: #1a1a1a;
+  --ns-muted: #54616e;
+  --ns-accent: #2f5d50;
+  --ns-accent-contrast: #ffffff;
+  --ns-border: #d6dbe1;
+  --ns-focus: #1d4ed8;
+
+  /* User-tunable typography (overridden inline by preferences.js) */
+  --ns-text-scale: 1;
+  --ns-line-height: 1.6;
+  --ns-letter-spacing: 0;
+  --ns-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --ns-motion: 200ms; /* set to 0ms when motion is reduced */
+}
+
+html[data-theme="dark"] {
+  --ns-bg: #14181d;
+  --ns-surface: #1d242b;
+  --ns-text: #eef1f4;
+  --ns-muted: #aab4bf;
+  --ns-accent: #7fd1bd;
+  --ns-accent-contrast: #0c1013;
+  --ns-border: #313a44;
+  --ns-focus: #93c5fd;
+}
+
+/* Maximum contrast for low vision — WCAG AAA contrast targets. */
+html[data-theme="high-contrast"] {
+  --ns-bg: #000000;
+  --ns-surface: #000000;
+  --ns-text: #ffffff;
+  --ns-muted: #ffffff;
+  --ns-accent: #ffff00;
+  --ns-accent-contrast: #000000;
+  --ns-border: #ffffff;
+  --ns-focus: #ffff00;
+}
+
+/* Calm, muted palette: low color intensity, gentle contrast. */
+html[data-theme="low-stimulation"] {
+  --ns-bg: #f3f1ea;
+  --ns-surface: #eae7dd;
+  --ns-text: #2c2a26;
+  --ns-muted: #6b665c;
+  --ns-accent: #5a6f63;
+  --ns-accent-contrast: #f3f1ea;
+  --ns-border: #d8d3c6;
+  --ns-focus: #5a6f63;
+}
+
+/* Apply tokens to the document shell. */
+html {
+  background-color: var(--ns-bg);
+  color: var(--ns-text);
+  font-family: var(--ns-font);
+  font-size: calc(1rem * var(--ns-text-scale));
+  line-height: var(--ns-line-height);
+  letter-spacing: var(--ns-letter-spacing);
+}
+
+/* Visible, high-contrast focus ring for keyboard users — never remove this. */
+:focus-visible {
+  outline: 3px solid var(--ns-focus);
+  outline-offset: 2px;
+}
+
+/* Honor reduced motion via the user toggle ... */
+html[data-reduce-motion="true"] * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ... and at the OS level. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip link: hidden until focused. */
+.ns-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--ns-accent);
+  color: var(--ns-accent-contrast);
+  padding: 0.75rem 1rem;
+  z-index: 100;
+}
+.ns-skip-link:focus {
+  left: 0;
+}
