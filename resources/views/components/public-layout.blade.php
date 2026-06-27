@@ -45,12 +45,19 @@
     <a href="#main-content" class="ns-skip-link">{{ __('messages.a11y.skip_to_content') }}</a>
 
     <header class="border-b border-[var(--ns-border)]">
-        <div class="mx-auto max-w-5xl px-4 py-4 flex flex-wrap items-center justify-between gap-4">
-            <a href="{{ route('home') }}" class="text-xl font-semibold tracking-tight" wire:navigate>
-                Neuro<span class="text-[var(--ns-accent)]">Scouts</span>
-            </a>
+        <div class="mx-auto max-w-5xl px-4 py-3">
+            {{-- Top row: brand left, settings always pinned right (so the
+                 dropdown's right-0 anchor never overflows the viewport). --}}
+            <div class="flex items-center gap-4">
+                <a href="{{ route('home') }}" class="text-xl font-semibold tracking-tight" wire:navigate>
+                    Neuro<span class="text-[var(--ns-accent)]">Scouts</span>
+                </a>
+                <div class="ml-auto">
+                    <x-a11y-preferences />
+                </div>
+            </div>
 
-            <nav aria-label="Primary" class="order-3 w-full sm:order-2 sm:w-auto">
+            <nav aria-label="Primary" class="mt-3">
                 <ul class="flex flex-wrap gap-x-5 gap-y-2 text-[var(--ns-muted)]">
                     @foreach ($nav as $item)
                         @php $active = request()->routeIs($item['route']); @endphp
@@ -64,10 +71,6 @@
                     @endforeach
                 </ul>
             </nav>
-
-            <div class="order-2 sm:order-3">
-                <x-a11y-preferences />
-            </div>
         </div>
     </header>
 
