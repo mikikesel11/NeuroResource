@@ -2,6 +2,8 @@
 
 use App\Domains\Profile\Http\Controllers\AboutController;
 use App\Domains\Resources\Http\Controllers\DownloadController;
+use App\Livewire\Blog\Index as BlogIndex;
+use App\Livewire\Blog\Show as BlogShow;
 use App\Livewire\Resources\Library;
 use App\Livewire\Resources\ResourcePage;
 use App\Livewire\Shop\Catalog;
@@ -21,8 +23,13 @@ Route::get('/resources', Library::class)->name('resources');
 Route::get('/resources/{slug}', ResourcePage::class)->name('resources.show');
 Route::get('/resources/{slug}/download', DownloadController::class)->name('resources.download');
 
+// Blog. Register the RSS feed (route name "feeds.blog") before the catch-all
+// post route so /blog/feed isn't captured as a post slug.
+Route::get('/blog', BlogIndex::class)->name('blog');
+Route::feeds();
+Route::get('/blog/{slug}', BlogShow::class)->name('blog.show');
+
 // Nav destinations built incrementally — placeholders so links never 404.
-Route::view('/blog', 'coming-soon', ['heading' => 'The Blog'])->name('blog');
 Route::view('/play', 'coming-soon', ['heading' => 'The Adventure'])->name('play');
 
 Route::view('dashboard', 'dashboard')
