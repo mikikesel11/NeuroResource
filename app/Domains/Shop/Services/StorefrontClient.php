@@ -25,8 +25,7 @@ class StorefrontClient
         private readonly string $token,
         private readonly string $apiVersion,
         private readonly int $cacheTtl,
-    ) {
-    }
+    ) {}
 
     public static function fromConfig(): self
     {
