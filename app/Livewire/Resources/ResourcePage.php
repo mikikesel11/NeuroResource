@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Resources;
 
+use App\Domains\Resources\Mail\ConfirmResourceUnlock;
 use App\Domains\Resources\Models\Resource;
 use App\Domains\Resources\Models\ResourceUnlock;
 use App\Domains\Resources\Support\ResourceGate;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -15,7 +18,7 @@ class ResourcePage extends Component
 
     public ?string $email = null;
 
-    public bool $justUnlocked = false;
+    public bool $pendingConfirmation = false;
 
     public function mount(string $slug): void
     {
@@ -24,23 +27,26 @@ class ResourcePage extends Component
         $this->slug = $slug;
     }
 
-    /** Email-gate capture: record the email, then unlock for this session. */
+    /**
+     * Email-gate capture (double opt-in): record a pending unlock and email a
+     * confirmation link. Access is granted only after the recipient confirms.
+     */
     public function unlock(): void
     {
         $data = $this->validate(['email' => ['required', 'email', 'max:255']]);
 
         $resource = $this->resource();
 
-        ResourceUnlock::create([
+        $unlock = ResourceUnlock::create([
             'resource_id' => $resource->id,
             'user_id' => auth()->id(),
             'email' => $data['email'],
+            'token' => Str::random(40),
         ]);
 
-        session()->push(ResourceGate::SESSION_KEY, $resource->slug);
+        Mail::to($data['email'])->send(new ConfirmResourceUnlock($unlock));
 
-        $this->justUnlocked = true;
-        // Next increment: trigger double opt-in confirmation + mailing-list sync.
+        $this->pendingConfirmation = true;
     }
 
     protected function resource(): Resource
@@ -55,6 +61,7 @@ class ResourcePage extends Component
         return view('livewire.resources.resource-page', [
             'resource' => $resource,
             'unlocked' => ResourceGate::unlocked($resource),
+            'justConfirmed' => (bool) session('justConfirmed'),
         ]);
     }
 }

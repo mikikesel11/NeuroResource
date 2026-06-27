@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Profile\Http\Controllers\AboutController;
+use App\Domains\Resources\Http\Controllers\ConfirmUnlockController;
 use App\Domains\Resources\Http\Controllers\DownloadController;
 use App\Livewire\Blog\Index as BlogIndex;
 use App\Livewire\Blog\Show as BlogShow;
@@ -20,6 +21,8 @@ Route::get('/shop/{handle}', ProductPage::class)->name('shop.product');
 
 // Resource Library (free + email-gated downloads — see ResourceGate)
 Route::get('/resources', Library::class)->name('resources');
+// Two-segment routes before the catch-all /resources/{slug}.
+Route::get('/resources/confirm/{token}', ConfirmUnlockController::class)->name('resources.confirm');
 Route::get('/resources/{slug}', ResourcePage::class)->name('resources.show');
 Route::get('/resources/{slug}/download', DownloadController::class)->name('resources.download');
 

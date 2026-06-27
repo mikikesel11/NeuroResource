@@ -21,20 +21,28 @@
 
     <div class="mt-8 rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] p-6">
         @if ($unlocked)
-            @if ($justUnlocked)
+            @if ($justConfirmed)
                 <p role="status" class="mb-4 text-sm text-[var(--ns-accent)]">
-                    Thank you — your Resource is unlocked below.
+                    Thank you — your Email is confirmed and you're on the list. Your Resource is below.
                 </p>
             @endif
             <a href="{{ route('resources.download', $resource->slug) }}"
                class="inline-block rounded-md bg-[var(--ns-accent)] px-6 py-3 font-medium text-[var(--ns-accent-contrast)]">
                 {{ $resource->type === 'link' ? 'Open Resource' : 'Download Resource' }}
             </a>
+        @elseif ($pendingConfirmation)
+            {{-- Double opt-in: waiting for the visitor to confirm via email. --}}
+            <h2 class="font-semibold">Please confirm your Email</h2>
+            <p role="status" class="mt-2 text-[var(--ns-muted)]">
+                We've sent a confirmation link to <strong>{{ $email }}</strong>. Select the link in
+                that Email to confirm and unlock your Resource. (Check your Spam folder if it's not there.)
+            </p>
         @else
-            {{-- Email gate: capture an Email, then unlock for this session. --}}
+            {{-- Email gate: capture an Email; access is granted after confirmation. --}}
             <h2 class="font-semibold">{{ __('messages.resources.unlock_cta') }}</h2>
             <p class="mt-1 text-sm text-[var(--ns-muted)]">
-                We'll send occasional, useful Resources. No spam — leave any time.
+                We'll email you a confirmation link, then send occasional, useful Resources.
+                No spam — leave any time.
             </p>
             <form wire:submit="unlock" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div class="flex-1">
@@ -48,7 +56,7 @@
                 </div>
                 <button type="submit"
                         class="rounded-md bg-[var(--ns-accent)] px-6 py-2 font-medium text-[var(--ns-accent-contrast)]">
-                    Unlock
+                    Send Confirmation
                 </button>
             </form>
         @endif
