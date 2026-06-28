@@ -141,6 +141,19 @@ html[data-reduce-motion="true"] * {
   left: 0;
 }
 
+/* Signed-in banner (public layout). Calm, low-stimulation accent strip. */
+.ns-auth-banner {
+  background: var(--ns-surface);
+  border-bottom: 1px solid var(--ns-border);
+  color: var(--ns-text);
+}
+.ns-banner-close {
+  color: var(--ns-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Adventure game (resources/js/adventure.js). Theme-token driven, calm spacing. */
 .adventure-scene-title {
   font-size: 1.5rem;

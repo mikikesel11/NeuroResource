@@ -5,6 +5,7 @@ use App\Domains\Game\Http\Controllers\GameProgressController;
 use App\Domains\Profile\Http\Controllers\AboutController;
 use App\Domains\Resources\Http\Controllers\ConfirmUnlockController;
 use App\Domains\Resources\Http\Controllers\DownloadController;
+use App\Livewire\Actions\Logout;
 use App\Livewire\Blog\Index as BlogIndex;
 use App\Livewire\Blog\Show as BlogShow;
 use App\Livewire\Resources\Library;
@@ -15,6 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 // Public site
 Route::view('/', 'home')->name('home');
+
+// Logout from the signed-in banner (Breeze handles it via a Livewire action
+// elsewhere; this gives the public layout a simple POST target).
+Route::post('/logout', function (Logout $logout) {
+    $logout();
+
+    return redirect('/');
+})->name('logout');
 Route::get('/about', AboutController::class)->name('about');
 
 // Shop (headless Shopify — see ProductCatalog binding)

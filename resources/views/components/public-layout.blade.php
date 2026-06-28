@@ -44,6 +44,27 @@
 <body class="min-h-screen flex flex-col bg-[var(--ns-bg)] text-[var(--ns-text)]">
     <a href="#main-content" class="ns-skip-link">{{ __('messages.a11y.skip_to_content') }}</a>
 
+    @if (session('justLoggedIn') && auth()->check())
+        {{-- Temporary "signed in" confirmation: auto-dismisses, or close it. --}}
+        <div id="ns-login-banner" class="ns-auth-banner" role="status" data-auto-dismiss="12000">
+            <div class="mx-auto max-w-5xl px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span>You're signed in as <strong>{{ auth()->user()->name }}</strong>.</span>
+                <button type="button" data-dismiss class="ns-banner-close" aria-label="Dismiss this message">
+                    Dismiss &times;
+                </button>
+            </div>
+        </div>
+        <script>
+            (function () {
+                var b = document.getElementById('ns-login-banner');
+                if (!b) return;
+                var close = function () { b.remove(); };
+                b.querySelector('[data-dismiss]').addEventListener('click', close);
+                setTimeout(close, parseInt(b.dataset.autoDismiss, 10) || 12000);
+            })();
+        </script>
+    @endif
+
     <header class="border-b border-[var(--ns-border)]">
         <div class="mx-auto max-w-5xl px-4 py-3">
             {{-- Top row: brand left, settings always pinned right (so the
@@ -52,7 +73,23 @@
                 <a href="{{ route('home') }}" class="text-xl font-semibold tracking-tight" wire:navigate>
                     Neuro<span class="text-[var(--ns-accent)]">Scouts</span>
                 </a>
-                <div class="ml-auto">
+                <div class="ml-auto flex items-center gap-4">
+                    @guest
+                        <a href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}"
+                           class="text-sm text-[var(--ns-muted)] hover:text-[var(--ns-text)] focus-visible:text-[var(--ns-text)]"
+                           wire:navigate>
+                            Log in
+                        </a>
+                    @else
+                        {{-- Persistent way to log out (the banner is only temporary). --}}
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="text-sm text-[var(--ns-muted)] hover:text-[var(--ns-text)] focus-visible:text-[var(--ns-text)]">
+                                Log out
+                            </button>
+                        </form>
+                    @endguest
                     <x-a11y-preferences />
                 </div>
             </div>
