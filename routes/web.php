@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Game\Http\Controllers\AdventureController;
+use App\Domains\Game\Http\Controllers\GameProgressController;
 use App\Domains\Profile\Http\Controllers\AboutController;
 use App\Domains\Resources\Http\Controllers\ConfirmUnlockController;
 use App\Domains\Resources\Http\Controllers\DownloadController;
@@ -35,6 +36,12 @@ Route::get('/blog/{slug}', BlogShow::class)->name('blog.show');
 
 // The Adventure game (accessible JSON-scene-graph engine; see AdventureController)
 Route::get('/play', AdventureController::class)->name('play');
+
+// Cross-device save for logged-in players (the engine syncs here too).
+Route::middleware('auth')->group(function () {
+    Route::get('/play/progress', [GameProgressController::class, 'show'])->name('play.progress.show');
+    Route::post('/play/progress', [GameProgressController::class, 'store'])->name('play.progress.store');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

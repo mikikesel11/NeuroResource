@@ -5,7 +5,12 @@
         <p class="text-sm uppercase tracking-wide text-[var(--ns-muted)]">The Adventure</p>
         <h1 class="mt-1 text-3xl font-semibold">{{ $storyTitle }}</h1>
 
-        <div id="adventure" class="adventure mt-8" aria-label="{{ $storyTitle }}">
+        <div id="adventure" class="adventure mt-8" aria-label="{{ $storyTitle }}"
+             data-story-id="{{ $storyTitle }}"
+             @auth
+                 data-authenticated="true"
+                 data-progress-url="{{ route('play.progress.show') }}"
+             @endauth>
             {{-- Replaced by the engine once loaded; fallbacks below. --}}
             <p class="adventure-loading text-[var(--ns-muted)]">Loading the Adventure…</p>
             <noscript>

@@ -38,11 +38,32 @@ class Adventure {
         this.root = root;
         this.story = story;
         this.scenes = story.scenes || {};
-        this.storageKey = STORAGE_PREFIX + (story.title || 'story');
+        this.storyId = root.dataset.storyId || story.title || 'story';
+        this.storageKey = STORAGE_PREFIX + this.storyId;
+
+        // Cross-device save for logged-in players (data-* set by the play page).
+        this.authenticated = root.dataset.authenticated === 'true';
+        this.progressUrl = root.dataset.progressUrl || null;
+        this.csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     }
 
-    start() {
-        const saved = this.load();
+    async start() {
+        let saved = null;
+
+        if (this.authenticated && this.progressUrl) {
+            saved = await this.loadRemote();
+            if (!saved) {
+                // No account save yet — migrate any anonymous local progress up.
+                const local = this.loadLocal();
+                if (local?.scene && this.scenes[local.scene]) {
+                    saved = local;
+                    this.saveRemote(local.scene, local.history || []);
+                }
+            }
+        }
+
+        if (!saved) saved = this.loadLocal();
+
         this.current = saved?.scene && this.scenes[saved.scene] ? saved.scene : this.story.start;
         this.history = Array.isArray(saved?.history) ? saved.history : [];
         this.render();
@@ -127,7 +148,12 @@ class Adventure {
         announcer.textContent = scene.title || '';
     }
 
-    load() {
+    save() {
+        this.saveLocal();
+        this.saveRemote(this.current, this.history);
+    }
+
+    loadLocal() {
         try {
             return JSON.parse(localStorage.getItem(this.storageKey) || 'null');
         } catch {
@@ -135,12 +161,40 @@ class Adventure {
         }
     }
 
-    save() {
+    saveLocal() {
         try {
             localStorage.setItem(this.storageKey, JSON.stringify({ scene: this.current, history: this.history }));
         } catch {
             /* storage unavailable — play continues without save */
         }
+    }
+
+    async loadRemote() {
+        try {
+            const res = await fetch(`${this.progressUrl}?story_id=${encodeURIComponent(this.storyId)}`, {
+                headers: { Accept: 'application/json' },
+            });
+            if (!res.ok) return null;
+            const data = await res.json();
+            return data && data.scene ? data : null;
+        } catch {
+            return null;
+        }
+    }
+
+    saveRemote(scene, history) {
+        if (!this.authenticated || !this.progressUrl) return;
+        fetch(this.progressUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': this.csrf,
+            },
+            body: JSON.stringify({ story_id: this.storyId, scene_id: scene, state: { history } }),
+        }).catch(() => {
+            /* offline or session expired — local save still holds */
+        });
     }
 }
 
