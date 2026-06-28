@@ -12,9 +12,10 @@ class AdventureController
      * client-side engine (resources/js/adventure.js). Progress is kept in the
      * browser; account sync is a future increment. See docs/system-design.md §3.4.
      *
-     * NOTE: served at /play within the app for now; it can later move to the
-     * play.neuroscouts.org subdomain as a static build (the engine is
-     * framework-agnostic). See docs/adventure-authoring.md.
+     * Served on the play subdomain when PLAY_DOMAIN is configured, otherwise at
+     * /play on the primary host (local/CI). The engine is framework-agnostic, so
+     * it can later move to a fully static play.neuroscouts.org build — see
+     * DEPLOYMENT.md and docs/adventure-authoring.md.
      */
     public function __invoke(): View
     {
