@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan tinker '--execute= *)"
+      "Bash(php artisan tinker '--execute= *)",
+      "Bash(pkill -f 'artisan serve')",
+      "Bash(pkill -f 'php -S 127.0.0.1:80')",
+      "Bash(lsof -ti:8000,8001)",
+      "Bash(gh pr *)"
     ]
   }
 }

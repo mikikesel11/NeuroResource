@@ -84,5 +84,7 @@
             <p>Made to be Calm, Clear, and Accessible.</p>
         </div>
     </footer>
+
+    @stack('scripts')
 </body>
 </html>

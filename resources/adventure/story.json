@@ -1,0 +1,50 @@
+{
+    "title": "The Quiet Path",
+    "version": 1,
+    "intro": "A gentle, no-pressure Adventure. There are no wrong choices — explore at your own pace, and go back any time.",
+    "start": "clearing",
+    "scenes": {
+        "clearing": {
+            "title": "A Clearing in the Woods",
+            "text": [
+                "You step into a calm Clearing. The Light is soft and the air is still.",
+                "Two paths lead onward, and there is no rush to choose."
+            ],
+            "choices": [
+                { "label": "Follow the soft, mossy path", "to": "stream" },
+                { "label": "Follow the bright, open path", "to": "meadow" }
+            ]
+        },
+        "stream": {
+            "title": "A Slow Stream",
+            "text": [
+                "The mossy path leads to a slow Stream. The Sound of water is steady and easy to follow.",
+                "You could rest by the water, or follow the Stream further in."
+            ],
+            "choices": [
+                { "label": "Rest by the water", "to": "rest" },
+                { "label": "Follow the Stream", "to": "meadow" },
+                { "label": "Go back to the Clearing", "to": "clearing" }
+            ]
+        },
+        "meadow": {
+            "title": "An Open Meadow",
+            "text": [
+                "The path opens into a wide Meadow. The Sky is large and quiet overhead.",
+                "You feel like you could stay here a while."
+            ],
+            "choices": [
+                { "label": "Lie down and watch the Sky", "to": "rest" },
+                { "label": "Head back to the Clearing", "to": "clearing" }
+            ]
+        },
+        "rest": {
+            "title": "A Moment of Rest",
+            "text": [
+                "You settle in and let your shoulders drop. Nothing here needs anything from you.",
+                "When you are ready, the Adventure will be here again."
+            ],
+            "ending": true
+        }
+    }
+}

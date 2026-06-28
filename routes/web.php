@@ -1,5 +1,6 @@
 <?php
 
+use App\Domains\Game\Http\Controllers\AdventureController;
 use App\Domains\Profile\Http\Controllers\AboutController;
 use App\Domains\Resources\Http\Controllers\ConfirmUnlockController;
 use App\Domains\Resources\Http\Controllers\DownloadController;
@@ -32,8 +33,8 @@ Route::get('/blog', BlogIndex::class)->name('blog');
 Route::feeds();
 Route::get('/blog/{slug}', BlogShow::class)->name('blog.show');
 
-// Nav destinations built incrementally — placeholders so links never 404.
-Route::view('/play', 'coming-soon', ['heading' => 'The Adventure'])->name('play');
+// The Adventure game (accessible JSON-scene-graph engine; see AdventureController)
+Route::get('/play', AdventureController::class)->name('play');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
