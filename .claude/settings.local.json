@@ -5,7 +5,13 @@
       "Bash(pkill -f 'artisan serve')",
       "Bash(pkill -f 'php -S 127.0.0.1:80')",
       "Bash(lsof -ti:8000,8001)",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "Bash(php artisan *)",
+      "Bash(./vendor/bin/pint)",
+      "Bash(npm run *)",
+      "Bash(lsof -ti:8000)",
+      "Bash(xargs kill)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }
