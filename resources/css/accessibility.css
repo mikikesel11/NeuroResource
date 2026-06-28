@@ -140,3 +140,57 @@ html[data-reduce-motion="true"] * {
 .ns-skip-link:focus {
   left: 0;
 }
+
+/* Adventure game (resources/js/adventure.js). Theme-token driven, calm spacing. */
+.adventure-scene-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.adventure-text {
+  margin-top: 1rem;
+}
+.adventure-ending {
+  margin-top: 1rem;
+  font-style: italic;
+  color: var(--ns-muted);
+}
+.adventure-choices {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.adventure-choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ns-border);
+  border-radius: 0.5rem;
+  background: var(--ns-surface);
+  color: var(--ns-text);
+  cursor: pointer;
+}
+.adventure-choice:hover,
+.adventure-choice:focus-visible {
+  border-color: var(--ns-accent);
+}
+.adventure-controls {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.adventure-control {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ns-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.adventure-control:hover,
+.adventure-control:focus-visible {
+  color: var(--ns-text);
+}
