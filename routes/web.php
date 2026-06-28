@@ -14,50 +14,73 @@ use App\Livewire\Shop\Catalog;
 use App\Livewire\Shop\ProductPage;
 use Illuminate\Support\Facades\Route;
 
-// Public site
-Route::view('/', 'home')->name('home');
+/*
+| The main site (everything except the Adventure game).
+*/
+$mainRoutes = function (): void {
+    Route::view('/', 'home')->name('home');
 
-// Logout from the signed-in banner (Breeze handles it via a Livewire action
-// elsewhere; this gives the public layout a simple POST target).
-Route::post('/logout', function (Logout $logout) {
-    $logout();
+    // Logout from the signed-in banner (Breeze handles it via a Livewire action
+    // elsewhere; this gives the public layout a simple POST target).
+    Route::post('/logout', function (Logout $logout) {
+        $logout();
 
-    return redirect('/');
-})->name('logout');
-Route::get('/about', AboutController::class)->name('about');
+        return redirect('/');
+    })->name('logout');
 
-// Shop (headless Shopify — see ProductCatalog binding)
-Route::get('/shop', Catalog::class)->name('shop');
-Route::get('/shop/{handle}', ProductPage::class)->name('shop.product');
+    Route::get('/about', AboutController::class)->name('about');
 
-// Resource Library (free + email-gated downloads — see ResourceGate)
-Route::get('/resources', Library::class)->name('resources');
-// Two-segment routes before the catch-all /resources/{slug}.
-Route::get('/resources/confirm/{token}', ConfirmUnlockController::class)->name('resources.confirm');
-Route::get('/resources/{slug}', ResourcePage::class)->name('resources.show');
-Route::get('/resources/{slug}/download', DownloadController::class)->name('resources.download');
+    // Shop (headless Shopify — see ProductCatalog binding)
+    Route::get('/shop', Catalog::class)->name('shop');
+    Route::get('/shop/{handle}', ProductPage::class)->name('shop.product');
 
-// Blog. Register the RSS feed (route name "feeds.blog") before the catch-all
-// post route so /blog/feed isn't captured as a post slug.
-Route::get('/blog', BlogIndex::class)->name('blog');
-Route::feeds();
-Route::get('/blog/{slug}', BlogShow::class)->name('blog.show');
+    // Resource Library (free + email-gated downloads — see ResourceGate)
+    Route::get('/resources', Library::class)->name('resources');
+    // Two-segment routes before the catch-all /resources/{slug}.
+    Route::get('/resources/confirm/{token}', ConfirmUnlockController::class)->name('resources.confirm');
+    Route::get('/resources/{slug}', ResourcePage::class)->name('resources.show');
+    Route::get('/resources/{slug}/download', DownloadController::class)->name('resources.download');
 
-// The Adventure game (accessible JSON-scene-graph engine; see AdventureController)
-Route::get('/play', AdventureController::class)->name('play');
+    // Blog. Register the RSS feed (route name "feeds.blog") before the catch-all
+    // post route so /blog/feed isn't captured as a post slug.
+    Route::get('/blog', BlogIndex::class)->name('blog');
+    Route::feeds();
+    Route::get('/blog/{slug}', BlogShow::class)->name('blog.show');
 
-// Cross-device save for logged-in players (the engine syncs here too).
-Route::middleware('auth')->group(function () {
-    Route::get('/play/progress', [GameProgressController::class, 'show'])->name('play.progress.show');
-    Route::post('/play/progress', [GameProgressController::class, 'store'])->name('play.progress.store');
-});
+    Route::view('dashboard', 'dashboard')
+        ->middleware(['auth', 'verified'])
+        ->name('dashboard');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    Route::view('profile', 'profile')
+        ->middleware(['auth'])
+        ->name('profile');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+    require __DIR__.'/auth.php';
+};
 
-require __DIR__.'/auth.php';
+/*
+| The Adventure game + its cross-device save API. $base is '' on the play
+| subdomain (game at the root) or '/play' in single-host mode.
+*/
+$adventureRoutes = function (string $base): void {
+    Route::get($base === '' ? '/' : $base, AdventureController::class)->name('play');
+
+    Route::middleware('auth')->group(function () use ($base) {
+        Route::get($base.'/progress', [GameProgressController::class, 'show'])->name('play.progress.show');
+        Route::post($base.'/progress', [GameProgressController::class, 'store'])->name('play.progress.store');
+    });
+};
+
+$playDomain = config('neuroscouts.domains.play');
+$primaryDomain = config('neuroscouts.domains.primary');
+
+if ($playDomain) {
+    // Split deployment: game on its own subdomain, the rest on the primary host.
+    // Domain constraints also make route() generate the correct host per side.
+    Route::domain($playDomain)->group(fn () => $adventureRoutes(''));
+    Route::domain($primaryDomain)->group($mainRoutes);
+} else {
+    // Single host (local / CI): game at /play.
+    $adventureRoutes('/play');
+    $mainRoutes();
+}

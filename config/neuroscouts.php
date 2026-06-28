@@ -39,4 +39,23 @@ return [
 
     'resource_access' => ['free', 'email'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Domains
+    |--------------------------------------------------------------------------
+    | The Adventure game is intended to live on its own subdomain
+    | (play.neuroscouts.org). When PLAY_DOMAIN is set, the game + its progress
+    | API are served on that host and the rest of the site on the primary host;
+    | route() then generates the correct host for each. When PLAY_DOMAIN is
+    | empty (local/dev/CI), everything runs on one host with the game at /play.
+    |
+    | For shared login across both hosts, set SESSION_DOMAIN to the registrable
+    | domain with a leading dot (e.g. ".neuroscouts.org"). See DEPLOYMENT.md.
+    */
+
+    'domains' => [
+        'primary' => env('APP_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        'play' => env('PLAY_DOMAIN'),
+    ],
+
 ];
