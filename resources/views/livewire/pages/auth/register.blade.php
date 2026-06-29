@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('components.public-layout', ['title' => 'Create account'])] class extends Component
 {
     public string $name = '';
     public string $email = '';
@@ -32,57 +32,57 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        // Show the temporary signed-in banner; go home, never the dashboard.
+        session()->flash('justLoggedIn', true);
+
+        $this->redirect(route('home', absolute: false));
     }
 }; ?>
 
-<div>
-    <form wire:submit="register">
-        <!-- Name -->
+<section class="mx-auto max-w-md px-4 py-16">
+    <h1 class="text-3xl font-semibold">Create an account</h1>
+    <p class="mt-2 text-[var(--ns-muted)]">Join NeuroScouts — it only takes a moment.</p>
+
+    <form wire:submit="register" class="mt-8 rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] p-6 space-y-5">
+        {{-- Name --}}
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <label for="name" class="block text-sm font-medium">Name</label>
+            <input type="text" id="name" wire:model="name" required autofocus autocomplete="name"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('name')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        {{-- Email --}}
+        <div>
+            <label for="email" class="block text-sm font-medium">Email</label>
+            <input type="email" id="email" wire:model="email" required autocomplete="username"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('email')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        {{-- Password --}}
+        <div>
+            <label for="password" class="block text-sm font-medium">Password</label>
+            <input type="password" id="password" wire:model="password" required autocomplete="new-password"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('password')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        {{-- Confirm Password --}}
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium">Confirm Password</label>
+            <input type="password" id="password_confirmation" wire:model="password_confirmation" required autocomplete="new-password"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('password_confirmation')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <a href="{{ route('login') }}" wire:navigate class="text-sm text-[var(--ns-accent)] underline underline-offset-4">
+                Already registered?
             </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
+            <button type="submit" class="rounded-md bg-[var(--ns-accent)] px-6 py-2.5 font-medium text-[var(--ns-accent-contrast)]">
+                Register
+            </button>
         </div>
     </form>
-</div>
+</section>

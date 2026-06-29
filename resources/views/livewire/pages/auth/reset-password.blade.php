@@ -10,7 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('components.public-layout', ['title' => 'Reset password'])] class extends Component
 {
     #[Locked]
     public string $token = '';
@@ -69,37 +69,39 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <form wire:submit="resetPassword">
-        <!-- Email Address -->
+<section class="mx-auto max-w-md px-4 py-16">
+    <h1 class="text-3xl font-semibold">Choose a new Password</h1>
+    <p class="mt-2 text-[var(--ns-muted)]">Almost there — set a new Password for your account.</p>
+
+    <form wire:submit="resetPassword" class="mt-8 rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] p-6 space-y-5">
+        {{-- Email --}}
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="block text-sm font-medium">Email</label>
+            <input type="email" id="email" wire:model="email" required autofocus autocomplete="username"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('email')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        {{-- Password --}}
+        <div>
+            <label for="password" class="block text-sm font-medium">Password</label>
+            <input type="password" id="password" wire:model="password" required autocomplete="new-password"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('password')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                          type="password"
-                          name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        {{-- Confirm Password --}}
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium">Confirm Password</label>
+            <input type="password" id="password_confirmation" wire:model="password_confirmation" required autocomplete="new-password"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('password_confirmation')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
+        <div class="flex justify-end pt-1">
+            <button type="submit" class="rounded-md bg-[var(--ns-accent)] px-6 py-2.5 font-medium text-[var(--ns-accent-contrast)]">
+                Reset Password
+            </button>
         </div>
     </form>
-</div>
+</section>
