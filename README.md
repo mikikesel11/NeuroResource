@@ -5,8 +5,6 @@ Resource Library, an About section for the featured person, and a gentle
 click-through Adventure game. Accessibility and a calm, low-stimulation
 experience are first-class requirements, not a polish pass.
 
-> Practical Tools for Focus, Regulation, and Rest.
-
 ---
 
 ## Features
