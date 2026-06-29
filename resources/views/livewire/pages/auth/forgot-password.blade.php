@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('components.public-layout', ['title' => 'Forgot password'])] class extends Component
 {
     public string $email = '';
 
@@ -36,26 +36,33 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<section class="mx-auto max-w-md px-4 py-16">
+    <h1 class="text-3xl font-semibold">Forgot your password?</h1>
+    <p class="mt-2 text-[var(--ns-muted)]">
+        No problem. Tell us your Email and we'll send a link to choose a new Password.
+    </p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    @if (session('status'))
+        <p role="status" class="mt-4 rounded-md bg-[var(--ns-surface)] px-4 py-3 text-sm text-[var(--ns-accent)]">
+            {{ session('status') }}
+        </p>
+    @endif
 
-    <form wire:submit="sendPasswordResetLink">
-        <!-- Email Address -->
+    <form wire:submit="sendPasswordResetLink" class="mt-8 rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] p-6 space-y-5">
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="block text-sm font-medium">Email</label>
+            <input type="email" id="email" wire:model="email" required autofocus autocomplete="username"
+                   class="mt-1 w-full rounded-md border border-[var(--ns-border)] bg-[var(--ns-bg)] px-3 py-2 text-[var(--ns-text)]">
+            @error('email')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <a href="{{ route('login') }}" wire:navigate class="text-sm text-[var(--ns-accent)] underline underline-offset-4">
+                Back to Log in
+            </a>
+            <button type="submit" class="rounded-md bg-[var(--ns-accent)] px-6 py-2.5 font-medium text-[var(--ns-accent-contrast)]">
+                Email Password Reset Link
+            </button>
         </div>
     </form>
-</div>
+</section>
