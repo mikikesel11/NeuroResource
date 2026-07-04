@@ -2,6 +2,7 @@
 
 use App\Domains\Game\Http\Controllers\AdventureController;
 use App\Domains\Game\Http\Controllers\GameProgressController;
+use App\Domains\Game\Http\Controllers\XpMetricsController;
 use App\Domains\Profile\Http\Controllers\AboutController;
 use App\Domains\Resources\Http\Controllers\ConfirmUnlockController;
 use App\Domains\Resources\Http\Controllers\DownloadController;
@@ -68,6 +69,7 @@ $adventureRoutes = function (string $base): void {
     Route::middleware('auth')->group(function () use ($base) {
         Route::get($base.'/progress', [GameProgressController::class, 'show'])->name('play.progress.show');
         Route::post($base.'/progress', [GameProgressController::class, 'store'])->name('play.progress.store');
+        Route::get($base.'/xp', XpMetricsController::class)->name('play.xp');
     });
 };
 

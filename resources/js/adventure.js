@@ -41,9 +41,12 @@ class Adventure {
         this.storyId = root.dataset.storyId || story.title || 'story';
         this.storageKey = STORAGE_PREFIX + this.storyId;
 
-        // Cross-device save for logged-in players (data-* set by the play page).
+        // Cross-device save and XP for logged-in players (data-* set by the play page).
         this.authenticated = root.dataset.authenticated === 'true';
         this.progressUrl = root.dataset.progressUrl || null;
+        this.xpUrl = root.dataset.xpUrl || null;
+        this.xpData = null;
+        this.hudEl = null;
         this.csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     }
 
@@ -66,6 +69,12 @@ class Adventure {
 
         this.current = saved?.scene && this.scenes[saved.scene] ? saved.scene : this.story.start;
         this.history = Array.isArray(saved?.history) ? saved.history : [];
+
+        if (this.authenticated && this.xpUrl) {
+            this.xpData = await this.loadXp();
+            if (this.xpData) this.hudEl = this.buildHud(this.xpData);
+        }
+
         this.render();
     }
 
@@ -141,7 +150,10 @@ class Adventure {
             controls.append(restartBtn);
         }
 
-        this.root.append(announcer, heading, body, actions, controls);
+        const children = this.hudEl
+            ? [this.hudEl, announcer, heading, body, actions, controls]
+            : [announcer, heading, body, actions, controls];
+        this.root.append(...children);
 
         // Move focus to the heading and announce the scene title.
         heading.focus();
@@ -180,6 +192,26 @@ class Adventure {
         } catch {
             return null;
         }
+    }
+
+    async loadXp() {
+        try {
+            const res = await fetch(this.xpUrl, { headers: { Accept: 'application/json' } });
+            if (!res.ok) return null;
+            return await res.json();
+        } catch {
+            return null;
+        }
+    }
+
+    buildHud(xp) {
+        const aside = el('aside', {
+            class: 'adventure-hud',
+            'aria-label': 'Your progress today',
+        });
+        const streakText = xp.streak > 0 ? ` · ${xp.streak}-day streak` : '';
+        aside.textContent = `Today: ${xp.daily} XP${streakText}`;
+        return aside;
     }
 
     saveRemote(scene, history) {
