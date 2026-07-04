@@ -10,6 +10,7 @@
              @auth
                  data-authenticated="true"
                  data-progress-url="{{ route('play.progress.show') }}"
+                 data-xp-url="{{ route('play.xp') }}"
              @endauth>
             {{-- Replaced by the engine once loaded; fallbacks below. --}}
             <p class="adventure-loading text-[var(--ns-muted)]">Loading the Adventure…</p>

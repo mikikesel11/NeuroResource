@@ -1,0 +1,65 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+# Dev server (runs Laravel + Vite concurrently with queue and log tail)
+composer dev
+
+# Tests
+php artisan test                        # full suite
+php artisan test --filter=ClassName     # single test class
+php artisan test --filter=test_name     # single test method
+
+# Code style (Laravel Pint)
+./vendor/bin/pint                       # fix
+./vendor/bin/pint --test                # check only (used in CI)
+
+# Asset build
+npm run dev        # hot reload (Vite on :5173)
+npm run build      # production bundle
+
+# Database
+php artisan migrate
+php artisan migrate --seed              # seeds sample content for local exploration
+```
+
+Tests run against SQLite in-memory (configured in `phpunit.xml`). Use `Carbon::setTestNow()` for time-sensitive tests and reset it in `tearDown`.
+
+## Architecture
+
+**Modular monolith.** All domain logic lives under `app/Domains/<Module>/` with clear internal boundaries. Modules: `Content` (blog), `Game` (adventure + XP), `Preferences` (accessibility), `Profile` (about/bio), `Resources` (library/downloads), `Shop` (headless Shopify).
+
+**Livewire + Volt** for full-page interactive components (shop catalog, blog, resource library). Blade for everything else. The Adventure game is a standalone vanilla-JS engine (`resources/js/adventure.js`) with no framework dependency — it reads a JSON data island and renders into `#adventure`.
+
+**Key patterns:**
+
+- **Shop seam** — `ProductCatalog` is a bound interface. `FakeCatalog` (local fixture data in `app/Domains/Shop/Catalog/products.php`) is the default; `ShopifyCatalog` activates when `SHOPIFY_STOREFRONT_TOKEN` is set. No code change required to switch.
+- **Resource gate** — `ResourceGate` in `app/Domains/Resources/Support/` controls free vs. email-gated downloads. Paid goods live in Shopify, never here.
+- **XP event log** — `xp_events` is an append-only table (`source`, `amount`, `awarded_at`). New XP sources add rows; the schema never changes. `XpService` owns all metric calculations. Login bonus is wired via `Illuminate\Auth\Events\Login` → `AwardDailyLoginXp` listener in `AppServiceProvider::boot()`.
+- **Adventure routing** — when `PLAY_DOMAIN` env var is set, the game is served on a subdomain via `Route::domain()`; otherwise it runs at `/play` on the primary host. The `$adventureRoutes` closure in `routes/web.php` handles both cases — always add game routes inside it.
+
+## Config
+
+App-specific config lives in `config/neuroresource.php`: supported locales, accessibility themes (`light`, `dark`, `high-contrast`, `low-stimulation`), resource access tiers, and domain config. Access via `config('neuroresource.*')`.
+
+## Accessibility requirements
+
+Accessibility is a first-class requirement for this NeuroDivergent audience, not a polish pass. When touching any UI:
+
+- All interactive elements must be keyboard-operable (`<button>`, not `<div onclick>`).
+- Focus must be managed explicitly on dynamic content changes (see `heading.focus()` in `adventure.js`).
+- Screen reader announcements via `aria-live="polite"` for dynamic updates; never `assertive` unless urgent.
+- No timers, autoplay, or time pressure anywhere.
+- Theme tokens come from CSS custom properties in `resources/css/accessibility.css` — use `var(--ns-*)` rather than hardcoded colours.
+- The four themes (`low-stimulation` is the calm default) must all remain coherent after any CSS change.
+
+## Content style
+
+All user-facing prose follows **Capitalize Key Terms** — product names, feature names, and section titles are capitalized (e.g. "The Adventure", "Resource Library", "Low Stimulation"). See `docs/writing-style.md` for the full voice guide.
+
+## Story / game content
+
+The Adventure story lives in `resources/adventure/story.json`. Run `php artisan tinker` → `(new App\Domains\Game\Support\Story)->validate()` to catch broken scene links before committing. See `docs/adventure-authoring.md` for the scene schema.

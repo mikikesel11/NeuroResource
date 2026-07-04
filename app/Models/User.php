@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domains\Game\Models\GameProgress;
+use App\Domains\Game\Models\XpEvent;
 use App\Domains\Preferences\Models\Preference;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -42,5 +43,10 @@ class User extends Authenticatable
     public function gameProgress(): HasMany
     {
         return $this->hasMany(GameProgress::class);
+    }
+
+    public function xpEvents(): HasMany
+    {
+        return $this->hasMany(XpEvent::class);
     }
 }
