@@ -1,5 +1,5 @@
 /*
- | NeuroScouts — Adventure engine.
+ | NeuroResource — Adventure engine.
  |
  | A small, framework-agnostic runtime for a branching, click-through story.
  | Reads a JSON scene graph (see resources/adventure/story.json and
@@ -11,7 +11,7 @@
  | - Progress (current scene + history) is saved to localStorage; "Go Back" and
  |   "Start Over" are always available. No timers, no autoplay, no wrong choices.
  |
- | Designed to be lifted to a static play.neuroscouts.org build later — it has no
+ | Designed to be lifted to a static play.neuroresource.org build later — it has no
  | server dependency beyond the story JSON embedded in the page.
  */
 

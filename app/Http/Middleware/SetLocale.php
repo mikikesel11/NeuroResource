@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Resolution order: explicit ?lang query → "locale" cookie → authenticated
  * user preference → Accept-Language header → configured fallback. Only locales
- * listed in config('neuroscouts.locales.supported') are honored.
+ * listed in config('neuroresource.locales.supported') are honored.
  *
  * NOTE: v1 resolves locale without URL prefixing so it can ship alongside the
  * Breeze auth routes untouched. URL-prefixed locales (/en, /es) are the planned
@@ -22,8 +22,8 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $supported = config('neuroscouts.locales.supported', ['en']);
-        $fallback = config('neuroscouts.locales.fallback', 'en');
+        $supported = config('neuroresource.locales.supported', ['en']);
+        $fallback = config('neuroresource.locales.fallback', 'en');
 
         $locale = $this->fromCandidates([
             $request->query('lang'),

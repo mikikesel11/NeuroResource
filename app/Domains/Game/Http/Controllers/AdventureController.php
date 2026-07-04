@@ -14,7 +14,7 @@ class AdventureController
      *
      * Served on the play subdomain when PLAY_DOMAIN is configured, otherwise at
      * /play on the primary host (local/CI). The engine is framework-agnostic, so
-     * it can later move to a fully static play.neuroscouts.org build — see
+     * it can later move to a fully static play.neuroresource.org build — see
      * DEPLOYMENT.md and docs/adventure-authoring.md.
      */
     public function __invoke(): View

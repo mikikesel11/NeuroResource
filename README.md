@@ -1,4 +1,4 @@
-# NeuroScouts
+# NeuroResource
 
 A website built **by and for NeuroDivergent people** — a Shop, a Blog, a
 Resource Library, an About section for the featured person, and a gentle

@@ -1,4 +1,4 @@
-# NeuroScouts — System Design
+# NeuroResource — System Design
 
 Status: Draft v1 · Owner: mikikesel11 · Date: 2026-06-26
 
@@ -14,7 +14,7 @@ Prose style for all user-facing copy is defined in [writing-style.md](writing-st
 ## 1. Requirements
 
 ### Functional
-- **Shop** — products, collections, cart rendered natively on `neuroscouts.org`,
+- **Shop** — products, collections, cart rendered natively on `neuroresource.org`,
   backed by **Shopify** via the Storefront API. Checkout hands off to Shopify.
 - **Blog** — authored posts, categories/tags, RSS, accessible reading view.
 - **Accounts** — first-party user accounts in v1. Needed for game cross-device
@@ -25,7 +25,7 @@ Prose style for all user-facing copy is defined in [writing-style.md](writing-st
   on our servers.
 - **About** — biography, list of Certifications, and links to each cert's
   verification page/credential.
-- **Adventure game** — branching click-through story on `play.neuroscouts.org`.
+- **Adventure game** — branching click-through story on `play.neuroresource.org`.
   Authored in a **visual editor** (Twine) for async collaboration with the
   content author. Save/resume progress. Fully keyboard- and screen-reader-navigable.
 - **Localization** — folder structure and locale routing set up in v1; ships
@@ -54,7 +54,7 @@ Prose style for all user-facing copy is defined in [writing-style.md](writing-st
 ## 2. High-Level Architecture
 
 ```
-                         neuroscouts.org (Laravel modular monolith)
+                         neuroresource.org (Laravel modular monolith)
    ┌──────────────────────────────────────────────────────────────────┐
    │  Web (Blade + light JS islands)                                    │
    │  ┌────────┐ ┌────────┐ ┌──────────────┐ ┌────────┐ ┌────────────┐  │
@@ -72,7 +72,7 @@ Prose style for all user-facing copy is defined in [writing-style.md](writing-st
          └─────────┘    └───────────┘    └───────────┘   │ (checkout/pay)   │
                                                           └──────────────────┘
 
-         play.neuroscouts.org  (Adventure — static SPA on CDN)
+         play.neuroresource.org  (Adventure — static SPA on CDN)
          ┌───────────────────────────────────────────────┐
          │ Story engine (JSON/Ink scene graph) + a11y UI  │
          │ progress in localStorage (+ optional API sync) │
@@ -281,9 +281,9 @@ for sync. No Admin API write access needed for the storefront use case.
 
 ## 8. Subdomains & Environments
 
-- `neuroscouts.org` — main Laravel app.
-- `play.neuroscouts.org` — static Adventure SPA (separate deploy, CDN).
-- `admin.neuroscouts.org` (or `/admin`) — authoring (Filament/Nova), restricted.
+- `neuroresource.org` — main Laravel app.
+- `play.neuroresource.org` — static Adventure SPA (separate deploy, CDN).
+- `admin.neuroresource.org` (or `/admin`) — authoring (Filament/Nova), restricted.
 - Environments: local → staging → production. Shopify has dev/prod stores; keep
   Storefront tokens in env/secrets, never in the repo.
 

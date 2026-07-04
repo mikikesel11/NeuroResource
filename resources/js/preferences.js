@@ -1,5 +1,5 @@
 /*
- | NeuroScouts — Accessibility preferences (client side).
+ | NeuroResource — Accessibility preferences (client side).
  |
  | Applies and persists the user's display preferences (theme, text size, line
  | height, letter spacing, reduced motion) to <html> as data-* attributes and

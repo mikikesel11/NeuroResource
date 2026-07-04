@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Cross-device save for the Adventure game (play.neuroscouts.org).
+        // Cross-device save for the Adventure game (play.neuroresource.org).
         // Anonymous players save in localStorage; this is the opt-in account sync.
         Schema::create('game_progress', function (Blueprint $table) {
             $table->id();

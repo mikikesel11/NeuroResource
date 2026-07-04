@@ -4,14 +4,14 @@
         ['route' => 'shop',      'title' => 'The Shop',          'body' => 'Tools, Printables, and Goods chosen to support Focus, Regulation, and Rest.'],
         ['route' => 'blog',      'title' => 'The Blog',          'body' => 'Plain-language writing on Executive Function, Sensory Load, Masking, and Burnout.'],
         ['route' => 'resources', 'title' => 'Resource Library',  'body' => 'Free and Email-gated Resources you can download, print, and share.'],
-        ['route' => 'about',     'title' => 'About',             'body' => 'Meet the person behind NeuroScouts — Biography, Certifications, and Credentials.'],
+        ['route' => 'about',     'title' => 'About',             'body' => 'Meet the person behind NeuroResource — Biography, Certifications, and Credentials.'],
         ['route' => 'play',      'title' => 'The Adventure',     'body' => 'A gentle, click-through Adventure you move through at your own pace.'],
     ];
 @endphp
 
 <x-public-layout title="Home">
     <section class="mx-auto max-w-5xl px-4 pt-16 pb-12">
-        <p class="text-sm uppercase tracking-wide text-[var(--ns-muted)]">Welcome to NeuroScouts</p>
+        <p class="text-sm uppercase tracking-wide text-[var(--ns-muted)]">Welcome to NeuroResource</p>
         <h1 class="mt-3 text-3xl sm:text-4xl font-semibold leading-tight max-w-3xl">
             {{ __('messages.home.tagline') }}
         </h1>

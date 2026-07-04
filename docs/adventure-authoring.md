@@ -53,6 +53,6 @@ ids matched up.
 
 ## Later
 
-The engine is framework-agnostic and can move to a static `play.neuroscouts.org`
+The engine is framework-agnostic and can move to a static `play.neuroresource.org`
 build without rewriting the content. Account-based cross-device save is a planned
 future increment (progress is currently saved in the browser).

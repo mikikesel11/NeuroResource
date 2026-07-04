@@ -1,6 +1,6 @@
-# NeuroScouts — Content & Writing Style
+# NeuroResource — Content & Writing Style
 
-> The voice of NeuroScouts is Warm, Direct, and Respectful. We write for
+> The voice of NeuroResource is Warm, Direct, and Respectful. We write for
 > NeuroDivergent readers first. Clarity is an Accessibility feature.
 
 ## The Capitalization Rule (Capitalize Key Terms)

@@ -1,9 +1,9 @@
 # Deployment
 
-Operational guide for deploying NeuroScouts. Pairs with the architecture in
+Operational guide for deploying NeuroResource. Pairs with the architecture in
 [docs/system-design.md](docs/system-design.md).
 
-NeuroScouts is a **modular-monolith Laravel app** with three external services
+NeuroResource is a **modular-monolith Laravel app** with three external services
 (Shopify for the shop, Plausible for analytics, an email provider for the
 resource opt-in) and an **Adventure game that can run on its own subdomain**.
 
@@ -29,7 +29,7 @@ Copy `.env.example` → `.env` and set values. Key variables:
 ### Core
 - `APP_NAME`, `APP_ENV=production`, `APP_DEBUG=false`
 - `APP_KEY` — generate once with `php artisan key:generate`
-- `APP_URL=https://neuroscouts.org`
+- `APP_URL=https://neuroresource.org`
 
 ### Database
 - `DB_CONNECTION=mysql` (or `pgsql`) + `DB_HOST/PORT/DATABASE/USERNAME/PASSWORD`
@@ -52,7 +52,7 @@ Copy `.env.example` → `.env` and set values. Key variables:
 - With no token set, the shop falls back to local fixtures (`FakeCatalog`) — fine for staging previews, not for real sales.
 
 ### Analytics
-- `PLAUSIBLE_DOMAIN=neuroscouts.org` (cookieless; no consent banner). Leave blank to disable. Off automatically in `local`/`testing`.
+- `PLAUSIBLE_DOMAIN=neuroresource.org` (cookieless; no consent banner). Leave blank to disable. Off automatically in `local`/`testing`.
 
 ### Game subdomain (see §5)
 - `APP_DOMAIN`, `PLAY_DOMAIN` (leave both blank for single-host), `SESSION_DOMAIN`.
@@ -101,27 +101,27 @@ There is currently no scheduled (cron) work; if added, run
 
 ## 5. The Adventure game subdomain
 
-The game is designed to live at **play.neuroscouts.org**. It's implemented so
+The game is designed to live at **play.neuroresource.org**. It's implemented so
 the *same app* can serve it on a subdomain, switched entirely by env:
 
 | Mode | Config | Behavior |
 |---|---|---|
 | Single host (local/CI/staging) | `PLAY_DOMAIN` empty | Game at `/play`, rest of site on the same host. |
-| Split | `PLAY_DOMAIN=play.neuroscouts.org` + `APP_DOMAIN=neuroscouts.org` | Game served at the **root of the play subdomain**; the rest of the site on the primary host. `route()` generates the correct host for each side automatically. |
+| Split | `PLAY_DOMAIN=play.neuroresource.org` + `APP_DOMAIN=neuroresource.org` | Game served at the **root of the play subdomain**; the rest of the site on the primary host. `route()` generates the correct host for each side automatically. |
 
 ### To enable the split
-1. **DNS** — point both `neuroscouts.org` and `play.neuroscouts.org` at the app.
-2. **TLS** — issue certificates for both hosts (a wildcard `*.neuroscouts.org`
+1. **DNS** — point both `neuroresource.org` and `play.neuroresource.org` at the app.
+2. **TLS** — issue certificates for both hosts (a wildcard `*.neuroresource.org`
    or a SAN cert covering both).
-3. **Env** — set `APP_DOMAIN=neuroscouts.org` and `PLAY_DOMAIN=play.neuroscouts.org`.
-4. **Shared login** — set `SESSION_DOMAIN=.neuroscouts.org` (leading dot) so the
+3. **Env** — set `APP_DOMAIN=neuroresource.org` and `PLAY_DOMAIN=play.neuroresource.org`.
+4. **Shared login** — set `SESSION_DOMAIN=.neuroresource.org` (leading dot) so the
    session cookie is shared across subdomains. This is what lets a visitor who
    logged in on the main site be recognized on the game subdomain (and is
    required for cross-device game save to sync while signed in).
 5. Rebuild the config cache (`php artisan config:cache`) and deploy.
 
 Verify after deploy:
-- `https://play.neuroscouts.org/` serves the game; `https://neuroscouts.org/`
+- `https://play.neuroresource.org/` serves the game; `https://neuroresource.org/`
   serves the home page.
 - Nav links on the game page point back to the primary host.
 
@@ -131,7 +131,7 @@ Verify after deploy:
   session they are signed in everywhere; they can return to the game. Improving
   cross-subdomain return-to-origin is a future enhancement.
 - **Fully static option** — because the engine is framework-agnostic, the game
-  can later be deployed as a static SPA on a CDN at `play.neuroscouts.org`. That
+  can later be deployed as a static SPA on a CDN at `play.neuroresource.org`. That
   would require: hosting the story JSON as a static asset, and exposing the
   progress API under CORS (allow the play origin, `withCredentials`) for
   signed-in save. Not needed for the current same-app split.
@@ -197,12 +197,12 @@ Verify after deploy:
 
 ## 11. Post-deploy smoke checklist
 
-- [ ] `https://neuroscouts.org/up` returns healthy.
+- [ ] `https://neuroresource.org/up` returns healthy.
 - [ ] Home, Shop, a product page, Blog + a post, Resource Library, About render.
 - [ ] Shop shows real Shopify products (token configured) and "Add to Cart" /
       checkout hands off to Shopify.
 - [ ] Email-gated resource: submitting an email sends the confirmation; the link
       confirms and unlocks the download.
-- [ ] `https://play.neuroscouts.org/` serves the game; progress saves while
+- [ ] `https://play.neuroresource.org/` serves the game; progress saves while
       signed in.
 - [ ] Plausible is recording; no console errors; reduced-motion + themes work.

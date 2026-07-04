@@ -47,7 +47,7 @@ return [
 
     // Plausible — cookieless analytics, no consent banner. See §11.
     'plausible' => [
-        'domain' => env('PLAUSIBLE_DOMAIN'),                     // e.g. neuroscouts.org
+        'domain' => env('PLAUSIBLE_DOMAIN'),                     // e.g. neuroresource.org
         'src' => env('PLAUSIBLE_SRC', 'https://plausible.io/js/script.js'),
     ],
 

@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "neuroscouts",
+      "name": "neuroresource",
       "runtimeExecutable": "php",
       "runtimeArgs": ["artisan", "serve", "--port=8000"],
       "port": 8000

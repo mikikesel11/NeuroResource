@@ -41,7 +41,7 @@ new #[Layout('components.public-layout', ['title' => 'Create account'])] class e
 
 <section class="mx-auto max-w-md px-4 py-16">
     <h1 class="text-3xl font-semibold">Create an account</h1>
-    <p class="mt-2 text-[var(--ns-muted)]">Join NeuroScouts — it only takes a moment.</p>
+    <p class="mt-2 text-[var(--ns-muted)]">Join NeuroResource — it only takes a moment.</p>
 
     <form wire:submit="register" class="mt-8 rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] p-6 space-y-5">
         {{-- Name --}}

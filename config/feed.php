@@ -11,7 +11,7 @@ return [
             // The feed is served at this URL (route auto-registered by the package).
             'url' => '/blog/feed',
 
-            'title' => 'The NeuroScouts Blog',
+            'title' => 'The NeuroResource Blog',
             'description' => 'Plain-language writing on Focus, Regulation, and life as a NeuroDivergent person.',
             'language' => 'en-US',
 

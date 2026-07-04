@@ -10,7 +10,7 @@ use RuntimeException;
 /**
  * Thin client for the Shopify Storefront GraphQL API (headless catalog + cart).
  *
- * We render products and carts natively on neuroscouts.org for full control over
+ * We render products and carts natively on neuroresource.org for full control over
  * accessibility and markup, then hand off to Shopify's hosted checkout for
  * payment — so no PCI scope touches our servers. See docs/system-design.md §3.1.
  *

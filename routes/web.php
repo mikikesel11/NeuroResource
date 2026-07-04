@@ -71,8 +71,8 @@ $adventureRoutes = function (string $base): void {
     });
 };
 
-$playDomain = config('neuroscouts.domains.play');
-$primaryDomain = config('neuroscouts.domains.primary');
+$playDomain = config('neuroresource.domains.play');
+$primaryDomain = config('neuroresource.domains.primary');
 
 if ($playDomain) {
     // Split deployment: game on its own subdomain, the rest on the primary host.
