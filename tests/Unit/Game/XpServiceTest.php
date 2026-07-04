@@ -18,7 +18,7 @@ class XpServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new XpService();
+        $this->service = new XpService;
     }
 
     protected function tearDown(): void
@@ -30,9 +30,9 @@ class XpServiceTest extends TestCase
     private function xpOn(User $user, string $date, int $amount, string $source = 'card_completed'): void
     {
         XpEvent::create([
-            'user_id'    => $user->id,
-            'source'     => $source,
-            'amount'     => $amount,
+            'user_id' => $user->id,
+            'source' => $source,
+            'amount' => $amount,
             'awarded_at' => Carbon::parse($date),
         ]);
     }
@@ -135,7 +135,7 @@ class XpServiceTest extends TestCase
         Carbon::setTestNow('2026-01-15');
         $user = User::factory()->create();
 
-        $first  = $this->service->award($user, 'daily_login', 10);
+        $first = $this->service->award($user, 'daily_login', 10);
         $second = $this->service->award($user, 'daily_login', 10);
 
         $this->assertNotNull($first);
@@ -148,9 +148,9 @@ class XpServiceTest extends TestCase
         $user = User::factory()->create();
 
         XpEvent::create([
-            'user_id'    => $user->id,
-            'source'     => 'card_completed',
-            'amount'     => 250,
+            'user_id' => $user->id,
+            'source' => 'card_completed',
+            'amount' => 250,
             'awarded_at' => now(),
         ]);
 

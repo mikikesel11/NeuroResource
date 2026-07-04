@@ -18,9 +18,9 @@ class XpService
         }
 
         return XpEvent::create([
-            'user_id'    => $user->id,
-            'source'     => $source,
-            'amount'     => $amount,
+            'user_id' => $user->id,
+            'source' => $source,
+            'amount' => $amount,
             'awarded_at' => $awardedAt,
         ]);
     }
@@ -95,13 +95,13 @@ class XpService
         }
 
         $mostRecent = $dates->first();
-        $yesterday  = Carbon::yesterday()->startOfDay();
+        $yesterday = Carbon::yesterday()->startOfDay();
 
         if ($mostRecent->lt($yesterday)) {
             return 0;
         }
 
-        $streak   = 0;
+        $streak = 0;
         $expected = $mostRecent->clone();
 
         foreach ($dates as $date) {
@@ -129,7 +129,7 @@ class XpService
             return 0;
         }
 
-        $maxStreak     = 1;
+        $maxStreak = 1;
         $currentStreak = 1;
 
         for ($i = 1; $i < $dates->count(); $i++) {
@@ -173,7 +173,7 @@ class XpService
 
     public function nextLevelXp(User $user): int
     {
-        $total        = $this->allTimeTotal($user);
+        $total = $this->allTimeTotal($user);
         $currentLevel = (int) floor($total / 100);
 
         return ($currentLevel + 1) * 100 - $total;
@@ -198,7 +198,7 @@ class XpService
 
         $result = [];
         for ($i = $days - 1; $i >= 0; $i--) {
-            $date     = Carbon::today()->subDays($i)->toDateString();
+            $date = Carbon::today()->subDays($i)->toDateString();
             $result[] = ['date' => $date, 'xp' => (int) ($events[$date] ?? 0)];
         }
 
@@ -245,7 +245,7 @@ class XpService
 
         $maxGap = 0;
         for ($i = 1; $i < $dates->count(); $i++) {
-            $gap    = (int) $dates[$i - 1]->diffInDays($dates[$i]) - 1;
+            $gap = (int) $dates[$i - 1]->diffInDays($dates[$i]) - 1;
             $maxGap = max($maxGap, $gap);
         }
 
@@ -255,21 +255,21 @@ class XpService
     public function metrics(User $user): array
     {
         return [
-            'daily'            => $this->dailyTotal($user),
-            'weekly'           => $this->weeklyTotal($user),
-            'monthly'          => $this->monthlyTotal($user),
-            'yearly'           => $this->yearlyTotal($user),
-            'all_time'         => $this->allTimeTotal($user),
-            'streak'           => $this->currentStreak($user),
-            'max_streak'       => $this->maxStreak($user),
-            'stats'            => $this->dailyStats($user),
-            'level'            => $this->level($user),
-            'next_level_xp'    => $this->nextLevelXp($user),
-            'active_days'      => $this->activeDays($user),
-            'recent'           => $this->recentActivity($user, 7),
+            'daily' => $this->dailyTotal($user),
+            'weekly' => $this->weeklyTotal($user),
+            'monthly' => $this->monthlyTotal($user),
+            'yearly' => $this->yearlyTotal($user),
+            'all_time' => $this->allTimeTotal($user),
+            'streak' => $this->currentStreak($user),
+            'max_streak' => $this->maxStreak($user),
+            'stats' => $this->dailyStats($user),
+            'level' => $this->level($user),
+            'next_level_xp' => $this->nextLevelXp($user),
+            'active_days' => $this->activeDays($user),
+            'recent' => $this->recentActivity($user, 7),
             'source_breakdown' => $this->sourceBreakdown($user),
-            'top_day'          => $this->topDay($user),
-            'longest_gap'      => $this->longestGap($user),
+            'top_day' => $this->topDay($user),
+            'longest_gap' => $this->longestGap($user),
         ];
     }
 }

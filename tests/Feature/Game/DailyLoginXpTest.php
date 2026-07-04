@@ -28,8 +28,8 @@ class DailyLoginXpTest extends TestCase
         $this->assertDatabaseCount('xp_events', 1);
         $this->assertDatabaseHas('xp_events', [
             'user_id' => $user->id,
-            'source'  => 'daily_login',
-            'amount'  => 10,
+            'source' => 'daily_login',
+            'amount' => 10,
         ]);
     }
 
