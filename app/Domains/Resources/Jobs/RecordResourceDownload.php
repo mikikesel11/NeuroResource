@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Resources\Jobs;
 
 use App\Domains\Resources\Models\Resource;

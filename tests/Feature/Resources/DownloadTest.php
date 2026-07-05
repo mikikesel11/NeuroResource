@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Resources;
 
 use App\Domains\Resources\Models\Resource;
@@ -21,7 +23,7 @@ class DownloadTest extends TestCase
 
     private function resource(string $access, array $overrides = []): Resource
     {
-        return Resource::create(array_merge([
+        return Resource::factory()->create(array_merge([
             'slug' => 'a-resource',
             'title' => ['en' => 'A Resource'],
             'summary' => ['en' => 'Summary.'],

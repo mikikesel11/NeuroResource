@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 | English UI strings. New locales are new folders (lang/es/messages.php, …)
 | with no code changes. Keys are grouped by site area. See design §7a.
@@ -26,6 +28,7 @@ return [
         'free_label' => 'Free Resource',
         'email_label' => 'Free with Email',
         'unlock_cta' => 'Enter your Email to unlock this Resource',
+        'unlock_throttled' => 'Too many Confirmation requests. Please wait :seconds seconds and try again.',
     ],
 
     'a11y' => [

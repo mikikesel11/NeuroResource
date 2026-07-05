@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -38,6 +40,22 @@ return [
     */
 
     'resource_access' => ['free', 'email'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email-Gate Unlock Flow
+    |--------------------------------------------------------------------------
+    | unlock_link_ttl_hours — how long a confirmation link stays valid. Links
+    | are signed + expiring so a forwarded/archived link can't unlock forever.
+    | unlock_max_attempts / unlock_decay_seconds — server-side rate limit on the
+    | public unlock endpoint (per IP + email) to prevent mail-bombing abuse.
+    */
+
+    'unlock_link_ttl_hours' => (int) env('RESOURCE_UNLOCK_LINK_TTL_HOURS', 24),
+
+    'unlock_max_attempts' => (int) env('RESOURCE_UNLOCK_MAX_ATTEMPTS', 5),
+
+    'unlock_decay_seconds' => (int) env('RESOURCE_UNLOCK_DECAY_SECONDS', 60),
 
     /*
     |--------------------------------------------------------------------------

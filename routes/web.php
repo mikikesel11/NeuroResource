@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Domains\Game\Http\Controllers\AdventureController;
 use App\Domains\Game\Http\Controllers\GameProgressController;
 use App\Domains\Game\Http\Controllers\XpMetricsController;
@@ -39,7 +41,11 @@ $mainRoutes = function (): void {
     // Resource Library (free + email-gated downloads — see ResourceGate)
     Route::get('/resources', Library::class)->name('resources');
     // Two-segment routes before the catch-all /resources/{slug}.
-    Route::get('/resources/confirm/{token}', ConfirmUnlockController::class)->name('resources.confirm');
+    // The confirm link is a signed + expiring URL (see ConfirmResourceUnlock);
+    // `signed` returns 403 on a tampered/expired link and `throttle` caps abuse.
+    Route::get('/resources/confirm/{token}', ConfirmUnlockController::class)
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('resources.confirm');
     Route::get('/resources/{slug}', ResourcePage::class)->name('resources.show');
     Route::get('/resources/{slug}/download', DownloadController::class)->name('resources.download');
 

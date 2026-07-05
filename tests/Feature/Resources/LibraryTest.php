@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Resources;
 
 use App\Domains\Content\Models\Tag;
@@ -15,7 +17,7 @@ class LibraryTest extends TestCase
 
     private function resource(string $title, ?string $publishedAt = 'now'): Resource
     {
-        return Resource::create([
+        return Resource::factory()->create([
             'slug' => str($title)->slug()->value(),
             'title' => ['en' => $title],
             'summary' => ['en' => "Summary for $title."],
