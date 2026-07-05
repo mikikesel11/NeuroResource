@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Game\Services;
 
 use App\Domains\Game\Models\Card;
 use App\Domains\Game\Models\UserCardPull;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class CardService
@@ -67,10 +71,24 @@ class CardService
 
     private function recordPull(User $user, Card $card): UserCardPull
     {
-        $pull = UserCardPull::firstOrCreate(
-            ['user_id' => $user->id, 'card_id' => $card->id],
-            ['pull_count' => 0]
-        );
+        $keys = ['user_id' => $user->id, 'card_id' => $card->id];
+
+        try {
+            return DB::transaction(fn () => $this->lockAndIncrement($keys));
+        } catch (UniqueConstraintViolationException) {
+            // A concurrent first-draw won the INSERT race; the row now exists,
+            // so re-run the locked increment against the existing row.
+            return DB::transaction(fn () => $this->lockAndIncrement($keys));
+        }
+    }
+
+    /**
+     * @param  array{user_id: int, card_id: int}  $keys
+     */
+    private function lockAndIncrement(array $keys): UserCardPull
+    {
+        $pull = UserCardPull::where($keys)->lockForUpdate()->first()
+            ?? UserCardPull::create([...$keys, 'pull_count' => 0]);
 
         $pull->increment('pull_count', 1, ['last_pulled_at' => now()]);
 

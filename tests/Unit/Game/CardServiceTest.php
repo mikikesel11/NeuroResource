@@ -8,6 +8,7 @@ use App\Domains\Game\Services\CardService;
 use App\Domains\Game\Services\XpService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -21,6 +22,12 @@ class CardServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new CardService(new XpService);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     private function card(string $deck, string $name = 'Card', int $xp = 10): Card
@@ -122,6 +129,45 @@ class CardServiceTest extends TestCase
             $result = $this->service->draw($user, 'mixed');
             $this->assertSame('Active', $result['card']->name);
         }
+    }
+
+    public function test_draw_with_preexisting_pull_row_increments_without_duplicating(): void
+    {
+        $user = User::factory()->create();
+        $card = $this->card('solo', 'Only Card');
+        UserCardPull::create([
+            'user_id' => $user->id,
+            'card_id' => $card->id,
+            'pull_count' => 2,
+            'last_pulled_at' => now()->subDay(),
+        ]);
+
+        $result = $this->service->draw($user, 'solo');
+
+        $this->assertSame(3, $result['pull_count'], 'Existing row increments rather than resetting');
+        $this->assertSame(
+            1,
+            UserCardPull::where('user_id', $user->id)->where('card_id', $card->id)->count(),
+            'Drawing an existing card must not create a duplicate pull row'
+        );
+    }
+
+    public function test_draw_updates_last_pulled_at_timestamp(): void
+    {
+        Carbon::setTestNow('2026-07-04 12:00:00');
+
+        $user = User::factory()->create();
+        $card = $this->card('solo', 'Only Card');
+
+        $this->service->draw($user, 'solo');
+
+        $pull = UserCardPull::where('user_id', $user->id)
+            ->where('card_id', $card->id)
+            ->first();
+
+        $this->assertNotNull($pull);
+        $this->assertSame(1, $pull->pull_count);
+        $this->assertTrue(Carbon::parse('2026-07-04 12:00:00')->equalTo($pull->last_pulled_at));
     }
 
     public function test_pull_counts_for_user_returns_card_id_keyed_map(): void
