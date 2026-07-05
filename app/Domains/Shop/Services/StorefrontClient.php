@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Shop\Services;
 
 use Illuminate\Http\Client\PendingRequest;
