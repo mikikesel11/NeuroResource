@@ -1,6 +1,7 @@
 /* NeuroScouts accessibility theme tokens (themes, focus, motion, skip link).
    Must precede other statements per CSS @import rules. */
 @import './accessibility.css';
+@import './card.css';
 
 @tailwind base;
 @tailwind components;
