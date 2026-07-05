@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Card extends Model
 {
-    protected $fillable = ['name', 'description', 'subtasks', 'deck', 'xp_earned', 'is_active'];
+    protected $fillable = ['name', 'description', 'subtasks', 'deck', 'xp_earned', 'is_active', 'timer_minutes'];
 
     protected function casts(): array
     {
@@ -18,6 +18,7 @@ class Card extends Model
             'xp_earned' => 'integer',
             'is_active' => 'boolean',
             'subtasks' => 'array',
+            'timer_minutes' => 'integer',
         ];
     }
 
