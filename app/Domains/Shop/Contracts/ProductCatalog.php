@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Shop\Contracts;
 
 use App\Domains\Shop\Data\ProductData;

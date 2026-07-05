@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Resources;
 
 use App\Domains\Content\Models\Tag;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Game\Listeners;
 
 use App\Domains\Game\Services\XpService;

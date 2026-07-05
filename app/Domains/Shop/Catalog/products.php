@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 | Fixture products for the FakeCatalog — used in development and CI when no
 | Shopify store is connected. Shaped to mirror the fields ShopifyCatalog maps

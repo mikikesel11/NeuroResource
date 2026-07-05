@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Blog;
 
 use App\Domains\Content\Models\Post;
