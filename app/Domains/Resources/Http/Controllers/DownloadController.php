@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Resources\Http\Controllers;
 
 use App\Domains\Resources\Jobs\RecordResourceDownload;
