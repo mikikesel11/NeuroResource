@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domains\Game\Models\GameProgress;
+use App\Domains\Game\Models\UserCardPull;
 use App\Domains\Game\Models\XpEvent;
 use App\Domains\Preferences\Models\Preference;
 use Database\Factories\UserFactory;
@@ -48,5 +49,10 @@ class User extends Authenticatable
     public function xpEvents(): HasMany
     {
         return $this->hasMany(XpEvent::class);
+    }
+
+    public function cardPulls(): HasMany
+    {
+        return $this->hasMany(UserCardPull::class);
     }
 }
