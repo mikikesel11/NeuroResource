@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ResourceSeeder extends Seeder
 {
+    // Columns guarded from mass assignment on the model; set via forceFill.
+    /** @var list<string> */
+    private const GUARDED_COLUMNS = ['access', 'download_count'];
+
     /**
      * Seed sample Resources (free, email-gated, and an external link) with tags
      * and placeholder files. Sample content — replace before launch. Idempotent.
@@ -63,10 +67,20 @@ class ResourceSeeder extends Seeder
         ];
 
         foreach ($resources as $row) {
+            // `access` (and `download_count`) are guarded — not mass-assignable —
+            // so split them out and apply them explicitly via forceFill.
+            $guarded = array_intersect_key($row['attrs'], array_flip(self::GUARDED_COLUMNS));
+            $fillable = array_diff_key($row['attrs'], $guarded);
+
             $resource = Resource::updateOrCreate(
                 ['slug' => str($row['attrs']['title']['en'])->slug()->value()],
-                $row['attrs'],
+                $fillable,
             );
+
+            if ($guarded !== []) {
+                $resource->forceFill($guarded)->save();
+            }
+
             $resource->tags()->sync($tags->only($row['tags'])->pluck('id'));
         }
     }
