@@ -9,6 +9,7 @@ use App\Domains\Resources\Http\Controllers\DownloadController;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Blog\Index as BlogIndex;
 use App\Livewire\Blog\Show as BlogShow;
+use App\Livewire\Game\CardDraw;
 use App\Livewire\Resources\Library;
 use App\Livewire\Resources\ResourcePage;
 use App\Livewire\Shop\Catalog;
@@ -70,6 +71,7 @@ $adventureRoutes = function (string $base): void {
         Route::get($base.'/progress', [GameProgressController::class, 'show'])->name('play.progress.show');
         Route::post($base.'/progress', [GameProgressController::class, 'store'])->name('play.progress.store');
         Route::get($base.'/xp', XpMetricsController::class)->name('play.xp');
+        Route::get($base.'/cards/{deck}', CardDraw::class)->name('cards.draw');
     });
 };
 

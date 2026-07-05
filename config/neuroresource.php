@@ -53,6 +53,36 @@ return [
     | domain with a leading dot (e.g. ".neuroresource.org"). See DEPLOYMENT.md.
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Card Decks
+    |--------------------------------------------------------------------------
+    | Visual configuration per deck slug. back_image is served from public/
+    | (use asset()). bg/accent/border are Tailwind classes applied to the
+    | card face. Add new decks here — no code change required.
+    */
+
+    'decks' => [
+        'focus' => [
+            'back_image' => 'images/cards/focus/back.jpg',
+            'bg' => 'from-blue-50 to-blue-100',
+            'accent' => 'text-blue-800',
+            'border' => 'border-blue-200',
+        ],
+        'calm' => [
+            'back_image' => 'images/cards/calm/back.jpg',
+            'bg' => 'from-green-50 to-teal-100',
+            'accent' => 'text-teal-800',
+            'border' => 'border-teal-200',
+        ],
+        'brave' => [
+            'back_image' => 'images/cards/brave/back.jpg',
+            'bg' => 'from-amber-50 to-orange-100',
+            'accent' => 'text-orange-800',
+            'border' => 'border-orange-200',
+        ],
+    ],
+
     'domains' => [
         'primary' => env('APP_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         'play' => env('PLAY_DOMAIN'),
