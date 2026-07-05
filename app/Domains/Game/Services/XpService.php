@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Game\Services;
 
 use App\Domains\Game\Models\XpEvent;
@@ -9,8 +11,25 @@ use Illuminate\Support\Facades\DB;
 
 class XpService
 {
+    /**
+     * Inclusive bounds for a single XP award. The `amount` column is an
+     * unsignedSmallInteger, so values outside this range cannot be stored.
+     */
+    public const MIN_AWARD = 0;
+
+    public const MAX_AWARD = 65535;
+
     public function award(User $user, string $source, int $amount, ?Carbon $awardedAt = null): ?XpEvent
     {
+        if ($amount < self::MIN_AWARD || $amount > self::MAX_AWARD) {
+            throw new \InvalidArgumentException(sprintf(
+                'XP award amount %d is out of range; must be between %d and %d.',
+                $amount,
+                self::MIN_AWARD,
+                self::MAX_AWARD,
+            ));
+        }
+
         $awardedAt ??= Carbon::now();
 
         if ($source === 'daily_login' && $this->hasDailyBonus($user, $awardedAt)) {
@@ -35,44 +54,41 @@ class XpService
 
     public function dailyTotal(User $user, ?Carbon $date = null): int
     {
-        return (int) XpEvent::where('user_id', $user->id)
-            ->whereDate('awarded_at', ($date ?? Carbon::today())->toDateString())
-            ->sum('amount');
+        $date ??= Carbon::now();
+
+        return $this->totalBetween($user, $date->clone()->startOfDay(), $date->clone()->endOfDay());
     }
 
     public function weeklyTotal(User $user, ?Carbon $week = null): int
     {
         $week ??= Carbon::now();
 
-        return (int) XpEvent::where('user_id', $user->id)
-            ->whereBetween('awarded_at', [
-                $week->clone()->startOfWeek(),
-                $week->clone()->endOfWeek(),
-            ])
-            ->sum('amount');
+        // Week boundaries follow Carbon's configured week-start (Monday by default).
+        return $this->totalBetween($user, $week->clone()->startOfWeek(), $week->clone()->endOfWeek());
     }
 
     public function monthlyTotal(User $user, ?Carbon $month = null): int
     {
         $month ??= Carbon::now();
 
-        return (int) XpEvent::where('user_id', $user->id)
-            ->whereBetween('awarded_at', [
-                $month->clone()->startOfMonth(),
-                $month->clone()->endOfMonth(),
-            ])
-            ->sum('amount');
+        return $this->totalBetween($user, $month->clone()->startOfMonth(), $month->clone()->endOfMonth());
     }
 
     public function yearlyTotal(User $user, ?Carbon $year = null): int
     {
         $year ??= Carbon::now();
 
+        return $this->totalBetween($user, $year->clone()->startOfYear(), $year->clone()->endOfYear());
+    }
+
+    /**
+     * Sum a user's XP over an inclusive [$start, $end] window. All period
+     * totals share this single boundary convention for consistency.
+     */
+    private function totalBetween(User $user, Carbon $start, Carbon $end): int
+    {
         return (int) XpEvent::where('user_id', $user->id)
-            ->whereBetween('awarded_at', [
-                $year->clone()->startOfYear(),
-                $year->clone()->endOfYear(),
-            ])
+            ->whereBetween('awarded_at', [$start, $end])
             ->sum('amount');
     }
 
