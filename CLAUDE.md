@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git workflow
+
+**Never commit directly to `main`.** Always:
+
+1. Create a feature branch first (`git checkout -b feat/...`)
+2. Commit there
+3. Ask about creating a PR
+4. Ask about merging the PR
+5. Ask what to do with the branch after merge
+
 ## Commands
 
 ```bash
