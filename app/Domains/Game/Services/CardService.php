@@ -6,6 +6,7 @@ namespace App\Domains\Game\Services;
 
 use App\Domains\Game\Models\Card;
 use App\Domains\Game\Models\UserCardPull;
+use App\Domains\Game\Models\XpEvent;
 use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -29,13 +30,23 @@ class CardService
         $card = $eligible->random();
 
         $pull = $this->recordPull($user, $card);
-        $xpEvent = $this->xp->award($user, "card:{$deck}-{$card->name}", $card->xp_earned);
 
+        // XP is awarded on completion, not on draw — see complete().
         return [
             'card' => $card,
             'pull_count' => $pull->pull_count,
-            'xp_awarded' => $xpEvent?->amount ?? 0,
         ];
+    }
+
+    /**
+     * Award the card's XP once the player marks it done. The source string is
+     * kept identical to the historical draw award ("card:{deck}-{name}") so XP
+     * breakdowns stay continuous. Callers must guard against double-awarding —
+     * xp_events is append-only and has no dedup for card sources.
+     */
+    public function complete(User $user, Card $card): ?XpEvent
+    {
+        return $this->xp->award($user, "card:{$card->deck}-{$card->name}", $card->xp_earned);
     }
 
     public function pullCountsForUser(User $user, string $deck): Collection

@@ -25,7 +25,7 @@ class CardDrawTest extends TestCase
         ]]);
     }
 
-    private function card(string $deck, string $name = 'Test Card', array $subtasks = []): Card
+    private function card(string $deck, string $name = 'Test Card', array $subtasks = [], ?int $timerMinutes = null): Card
     {
         return Card::create([
             'name' => $name,
@@ -34,6 +34,7 @@ class CardDrawTest extends TestCase
             'xp_earned' => 10,
             'is_active' => true,
             'subtasks' => $subtasks ?: null,
+            'timer_minutes' => $timerMinutes,
         ]);
     }
 
@@ -117,5 +118,104 @@ class CardDrawTest extends TestCase
         $this->actingAs($user)
             ->get(route('cards.draw', ['deck' => 'nonexistent']))
             ->assertNotFound();
+    }
+
+    public function test_draw_does_not_award_xp(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus');
+
+        Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw')
+            ->assertSet('cardDone', false);
+
+        $this->assertDatabaseCount('xp_events', 0);
+    }
+
+    public function test_mark_done_sets_card_done_and_awards_xp_once(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus');
+
+        $component = Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw')
+            ->call('markDone')
+            ->assertSet('cardDone', true);
+
+        $this->assertSame(10, $component->get('result')['xp_awarded']);
+        $this->assertDatabaseCount('xp_events', 1);
+    }
+
+    public function test_mark_done_twice_awards_xp_only_once(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus');
+
+        Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw')
+            ->call('markDone')
+            ->call('markDone');
+
+        $this->assertDatabaseCount('xp_events', 1);
+    }
+
+    public function test_checking_last_subtask_completes_card_and_awards_once(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus', 'Two Steps', ['First', 'Second']);
+
+        $component = Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw')
+            ->call('toggleSubtask', 0)
+            ->assertSet('cardDone', false)
+            ->call('toggleSubtask', 1)
+            ->assertSet('cardDone', true);
+
+        $this->assertDatabaseCount('xp_events', 1);
+        $this->assertSame(10, $component->get('result')['xp_awarded']);
+    }
+
+    public function test_non_final_subtask_does_not_complete_card(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus', 'Two Steps', ['First', 'Second']);
+
+        Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw')
+            ->call('toggleSubtask', 0)
+            ->assertSet('cardDone', false);
+
+        $this->assertDatabaseCount('xp_events', 0);
+    }
+
+    public function test_reset_draw_clears_card_done(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus');
+
+        Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw')
+            ->call('markDone')
+            ->assertSet('cardDone', true)
+            ->call('resetDraw')
+            ->assertSet('cardDone', false);
+    }
+
+    public function test_timer_minutes_is_exposed_on_result(): void
+    {
+        $user = User::factory()->create();
+        $this->card('focus', 'Timed', [], 20);
+
+        $component = Livewire::actingAs($user)
+            ->test(CardDraw::class, ['deck' => 'focus'])
+            ->call('draw');
+
+        $this->assertSame(20, $component->get('result')['card']->timer_minutes);
     }
 }

@@ -77,14 +77,25 @@ class CardServiceTest extends TestCase
         $this->assertSame(2, $fourth['pull_count'], 'Fourth draw starts second cycle at pull_count 2');
     }
 
-    public function test_awards_xp_on_draw(): void
+    public function test_draw_does_not_award_xp(): void
     {
         $user = User::factory()->create();
         $this->card('brave', 'Stand Tall', 15);
 
         $result = $this->service->draw($user, 'brave');
 
-        $this->assertSame(15, $result['xp_awarded']);
+        $this->assertArrayNotHasKey('xp_awarded', $result);
+        $this->assertDatabaseCount('xp_events', 0);
+    }
+
+    public function test_complete_awards_xp(): void
+    {
+        $user = User::factory()->create();
+        $card = $this->card('brave', 'Stand Tall', 15);
+
+        $event = $this->service->complete($user, $card);
+
+        $this->assertSame(15, $event?->amount);
         $this->assertDatabaseHas('xp_events', [
             'user_id' => $user->id,
             'source' => 'card:brave-Stand Tall',

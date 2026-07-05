@@ -207,3 +207,28 @@ html[data-reduce-motion="true"] * {
 .adventure-control:focus-visible {
   color: var(--ns-text);
 }
+
+/* Card game — opt-in timer HUD chip + reminder panel. Calm, token-driven,
+   no pulsing or flashing (the countdown is plain text). */
+.ns-card-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--ns-border);
+  border-radius: 9999px;
+  background: var(--ns-surface);
+  color: var(--ns-text);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.ns-card-reminder {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ns-accent);
+  border-radius: 0.75rem;
+  background: var(--ns-surface);
+}
+.ns-card-reminder:focus-visible {
+  outline: 2px solid var(--ns-focus);
+  outline-offset: 2px;
+}
