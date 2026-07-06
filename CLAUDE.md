@@ -42,6 +42,14 @@ Tests run against SQLite in-memory (configured in `phpunit.xml`). Use `Carbon::s
 
 **Modular monolith.** All domain logic lives under `app/Domains/<Module>/` with clear internal boundaries. Modules: `Content` (blog), `Game` (adventure + XP), `Preferences` (accessibility), `Profile` (about/bio), `Resources` (library/downloads), `Shop` (headless Shopify).
 
+**Recent Security Hardening (v1.6, Jul 6):**
+- HTTP headers: X-Content-Type-Options, Referrer-Policy (protects email-gate tokens), Permissions-Policy
+- Email-gate: rate limiting per IP+email, signed+expiring links, mass-assignment protection, session de-dup
+- HTML sanitization: `safe_markdown()` helper (CommonMark + tgalopin/html-sanitizer)
+- URL validation: credential_url rejects non-http(s) schemes
+- Type safety: `declare(strict_types=1)` across codebase
+- Removed dead auth scaffolding (GuestLayout, layouts/guest.blade.php, auth-session-status component, @tailwindcss/vite)
+
 **Livewire + Volt** for full-page interactive components (shop catalog, blog, resource library). Blade for everything else. The Adventure game is a standalone vanilla-JS engine (`resources/js/adventure.js`) with no framework dependency — it reads a JSON data island and renders into `#adventure`.
 
 **Key patterns:**
@@ -75,3 +83,12 @@ All user-facing prose follows **Capitalize Key Terms** — product names, featur
 The Adventure story lives in `resources/adventure/story.json`. Run `php artisan tinker` → `(new App\Domains\Game\Support\Story)->validate()` to catch broken scene links before committing. See `docs/adventure-authoring.md` for the scene schema.
 
 Card game cards (`cards` table, seeded by `CardSeeder`) may set an optional `timer_minutes`. When present, the drawn card offers a player-started "Start a N-minute timer" button; leave it `null` for cards with no time element. XP (`xp_earned`) is granted on **completion** (marking the card done or checking its last subtask), not on draw.
+
+## Architecture Codemaps
+
+For detailed implementation guides, module structure, data flows, and security details, see:
+- `docs/CODEMAPS/INDEX.md` — overview of all areas and recent changes
+- `docs/CODEMAPS/frontend.md` — Livewire, Blade, themes, accessibility
+- `docs/CODEMAPS/backend.md` — controllers, services, models, routes
+- `docs/CODEMAPS/database.md` — complete schema and relationships
+- `docs/CODEMAPS/security.md` — headers, email-gate, validation, sanitization
