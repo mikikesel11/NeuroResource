@@ -39,14 +39,26 @@ class CardService
     }
 
     /**
-     * Award the card's XP once the player marks it done. The source string is
-     * kept identical to the historical draw award ("card:{deck}-{name}") so XP
-     * breakdowns stay continuous. Callers must guard against double-awarding —
-     * xp_events is append-only and has no dedup for card sources.
+     * Award the card's XP once the player marks it done. Uses an atomic
+     * UPDATE WHERE completed_at IS NULL as the database-level guard so that
+     * concurrent Livewire requests carrying the same stale snapshot cannot
+     * both award XP. Returns null if the card was already completed this pull.
      */
     public function complete(User $user, Card $card): ?XpEvent
     {
-        return $this->xp->award($user, "card:{$card->deck}-{$card->name}", $card->xp_earned);
+        return DB::transaction(function () use ($user, $card) {
+            $updated = DB::table('user_card_pulls')
+                ->where('user_id', $user->id)
+                ->where('card_id', $card->id)
+                ->whereNull('completed_at')
+                ->update(['completed_at' => now()]);
+
+            if ($updated === 0) {
+                return null;
+            }
+
+            return $this->xp->award($user, "card:{$card->deck}-{$card->name}", $card->xp_earned);
+        });
     }
 
     public function pullCountsForUser(User $user, string $deck): Collection
@@ -101,7 +113,7 @@ class CardService
         $pull = UserCardPull::where($keys)->lockForUpdate()->first()
             ?? UserCardPull::create([...$keys, 'pull_count' => 0]);
 
-        $pull->increment('pull_count', 1, ['last_pulled_at' => now()]);
+        $pull->increment('pull_count', 1, ['last_pulled_at' => now(), 'completed_at' => null]);
 
         return $pull->fresh();
     }
