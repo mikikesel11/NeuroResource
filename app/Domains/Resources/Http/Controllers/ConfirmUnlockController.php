@@ -29,7 +29,8 @@ class ConfirmUnlockController
         $resource = $unlock->resource;
 
         if (! $unlock->isConfirmed()) {
-            $unlock->update(['confirmed_at' => now()]);
+            $unlock->confirmed_at = now();
+            $unlock->save();
             // Integration point: add $unlock->email to the mailing list here.
 
             // Grant session access only on first confirmation. Re-visits (email
