@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Shop;
 
 use App\Livewire\Shop\ProductPage;
