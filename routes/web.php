@@ -47,7 +47,9 @@ $mainRoutes = function (): void {
         ->middleware(['signed', 'throttle:6,1'])
         ->name('resources.confirm');
     Route::get('/resources/{slug}', ResourcePage::class)->name('resources.show');
-    Route::get('/resources/{slug}/download', DownloadController::class)->name('resources.download');
+    Route::get('/resources/{slug}/download', DownloadController::class)
+        ->middleware('throttle:30,1')
+        ->name('resources.download');
 
     // Blog. Register the RSS feed (route name "feeds.blog") before the catch-all
     // post route so /blog/feed isn't captured as a post slug.

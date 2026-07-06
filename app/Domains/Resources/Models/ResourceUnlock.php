@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ResourceUnlock extends Model
 {
-    protected $fillable = ['resource_id', 'user_id', 'email', 'token', 'confirmed_at'];
+    protected $fillable = ['resource_id', 'user_id', 'email'];
 
     protected $casts = [
         'confirmed_at' => 'datetime',
