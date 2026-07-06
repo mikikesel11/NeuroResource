@@ -29,10 +29,7 @@
 
         {{-- Accessible reading view: comfortable measure, generous spacing. --}}
         <div class="ns-prose mt-8 space-y-4 text-[var(--ns-text)]">
-            {!! \Illuminate\Support\Str::markdown($post->body, [
-                'html_input' => 'strip',
-                'allow_unsafe_links' => false,
-            ]) !!}
+            {!! safe_markdown($post->body) !!}
         </div>
     </article>
 </div>
