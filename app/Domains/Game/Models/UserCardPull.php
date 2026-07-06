@@ -10,13 +10,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserCardPull extends Model
 {
-    protected $fillable = ['user_id', 'card_id', 'pull_count', 'last_pulled_at'];
+    protected $fillable = ['user_id', 'card_id', 'pull_count', 'last_pulled_at', 'completed_at'];
 
     protected function casts(): array
     {
         return [
             'pull_count' => 'integer',
             'last_pulled_at' => 'datetime',
+            'completed_at' => 'datetime',
         ];
     }
 

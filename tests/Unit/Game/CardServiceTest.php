@@ -93,6 +93,7 @@ class CardServiceTest extends TestCase
         $user = User::factory()->create();
         $card = $this->card('brave', 'Stand Tall', 15);
 
+        $this->service->draw($user, 'brave');
         $event = $this->service->complete($user, $card);
 
         $this->assertSame(15, $event?->amount);
@@ -101,6 +102,21 @@ class CardServiceTest extends TestCase
             'source' => 'card:brave-Stand Tall',
             'amount' => 15,
         ]);
+    }
+
+    public function test_complete_is_idempotent_at_database_level(): void
+    {
+        $user = User::factory()->create();
+        $card = $this->card('brave', 'Stand Tall', 15);
+
+        $this->service->draw($user, 'brave');
+
+        $event1 = $this->service->complete($user, $card);
+        $event2 = $this->service->complete($user, $card); // second call rejected at DB level
+
+        $this->assertNotNull($event1);
+        $this->assertNull($event2);
+        $this->assertDatabaseCount('xp_events', 1);
     }
 
     public function test_throws_when_deck_has_no_active_cards(): void
