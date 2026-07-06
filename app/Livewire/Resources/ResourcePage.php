@@ -59,8 +59,6 @@ class ResourcePage extends Component
 
         RateLimiter::hit($this->throttleKey($data['email']), $this->decaySeconds());
 
-        RateLimiter::hit($this->throttleKey($data['email']), $this->decaySeconds());
-
         Mail::to($data['email'])->send(new ConfirmResourceUnlock($unlock));
 
         $this->pendingConfirmation = true;
