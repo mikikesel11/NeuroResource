@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             ProfileSeeder::class,
             ResourceSeeder::class,
             PostSeeder::class,
+            CardSeeder::class,
         ]);
     }
 }

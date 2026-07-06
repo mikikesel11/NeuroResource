@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Profile\Http\Controllers;
 
 use App\Domains\Profile\Models\Profile;

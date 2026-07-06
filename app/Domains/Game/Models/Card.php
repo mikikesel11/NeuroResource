@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Game\Models;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Card extends Model
 {
-    protected $fillable = ['name', 'description', 'subtasks', 'deck', 'xp_earned', 'is_active'];
+    protected $fillable = ['name', 'description', 'subtasks', 'deck', 'xp_earned', 'is_active', 'timer_minutes'];
 
     protected function casts(): array
     {
@@ -16,6 +18,7 @@ class Card extends Model
             'xp_earned' => 'integer',
             'is_active' => 'boolean',
             'subtasks' => 'array',
+            'timer_minutes' => 'integer',
         ];
     }
 

@@ -44,8 +44,9 @@ class ConfirmUnlockTest extends TestCase
         $unlock = ResourceUnlock::create([
             'resource_id' => $resource->id,
             'email' => 'person@example.com',
-            'token' => 'test-token-123',
         ]);
+        $unlock->token = 'test-token-123';
+        $unlock->save();
 
         return [$resource, $unlock];
     }

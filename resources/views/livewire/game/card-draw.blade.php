@@ -1,7 +1,51 @@
 <div
     x-data="{
         phase: @entangle('phase'),
+        cardDone: @entangle('cardDone'),
         reduceMotion: document.documentElement.dataset.reduceMotion === 'true',
+
+        /* Opt-in, self-started timer. In-memory only — resets on reload/navigation.
+           No sound, no autoplay: a gentle reminder, never imposed time pressure. */
+        remaining: 0,
+        timerActive: false,
+        reminder: false,
+        timerId: null,
+        announce: '',
+
+        startTimer(minutes) {
+            this.cancelTimer();
+            this.remaining = minutes * 60;
+            this.timerActive = true;
+            this.announce = 'Timer started for ' + minutes + (minutes === 1 ? ' minute.' : ' minutes.');
+            this.timerId = setInterval(() => this.tick(), 1000);
+        },
+
+        tick() {
+            this.remaining--;
+            if (this.remaining <= 0) {
+                clearInterval(this.timerId);
+                this.timerId = null;
+                this.timerActive = false;
+                if (!this.cardDone) {
+                    this.reminder = true;
+                    this.announce = 'Time is up — here is your reminder.';
+                }
+            }
+        },
+
+        cancelTimer() {
+            if (this.timerId) clearInterval(this.timerId);
+            this.timerId = null;
+            this.timerActive = false;
+            this.reminder = false;
+        },
+
+        mmss() {
+            const s = Math.max(0, this.remaining);
+            const m = Math.floor(s / 60);
+            const sec = String(s % 60).padStart(2, '0');
+            return m + ':' + sec;
+        },
 
         startDraw() {
             if (this.reduceMotion) {
@@ -19,6 +63,15 @@
             if (this.phase === 'flipping' && event.propertyName === 'transform') {
                 this.phase = 'revealed';
             }
+        },
+
+        init() {
+            // Completing the card (button or last subtask) cancels the timer.
+            this.$watch('cardDone', v => { if (v) this.cancelTimer(); });
+            // Drawing another card clears any running timer.
+            this.$watch('phase', v => { if (v === 'idle') this.cancelTimer(); });
+            // Move focus to the reminder when it appears.
+            this.$watch('reminder', v => { if (v) this.$nextTick(() => this.$refs.reminderPanel?.focus()); });
         }
     }"
     @card-drawn.window="onCardDrawn()"
@@ -29,6 +82,16 @@
         @if ($result && $phase === 'revealed')
             {{ $result['card']->name }}
         @endif
+    </div>
+
+    {{-- Polite live region for timer start / reminder (never per-second) --}}
+    <p class="sr-only" aria-live="polite" x-text="announce"></p>
+
+    {{-- ── TIMER HUD ───────────────────────────────────────────────────── --}}
+    <div x-show="timerActive" x-cloak class="mb-6 flex justify-center">
+        <span class="ns-card-timer">
+            ⏳ <span x-text="mmss()" aria-hidden="true"></span> left
+        </span>
     </div>
 
     <h1 class="mb-8 text-center text-2xl font-semibold text-[var(--ns-text)]">
@@ -117,9 +180,13 @@
                             </ul>
                         @endif
 
+                        {{-- XP is earned on completion, not on draw. --}}
                         <div class="mt-4 flex items-center gap-1.5">
-                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $deckTheme['accent'] }} bg-white/50">
-                                +{{ $result['xp_awarded'] }} XP
+                            <span x-show="!cardDone" class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $deckTheme['accent'] }} bg-white/50">
+                                Earn +{{ $result['card']->xp_earned }} XP
+                            </span>
+                            <span x-show="cardDone" x-cloak class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $deckTheme['accent'] }} bg-white/50">
+                                +{{ $result['xp_awarded'] }} XP earned ✓
                             </span>
                         </div>
                     @endif
@@ -133,12 +200,70 @@
             x-init="$watch('phase', v => { if (v === 'revealed') $nextTick(() => document.getElementById('card-title')?.focus()) })"
         ></div>
 
-        <button
-            x-show="phase === 'revealed'"
-            wire:click="resetDraw"
-            class="rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] px-6 py-2.5 text-sm font-medium text-[var(--ns-text)] transition hover:bg-[var(--ns-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
-        >
-            Draw Another Card
-        </button>
+        {{-- ── CARD ACTIONS (revealed) ─────────────────────────────────── --}}
+        <div x-show="phase === 'revealed'" x-cloak class="flex flex-col items-center gap-3">
+            @if ($result && $result['card']->timer_minutes)
+                <button
+                    x-show="!timerActive && !cardDone"
+                    x-on:click="startTimer({{ (int) $result['card']->timer_minutes }})"
+                    class="rounded-lg bg-[var(--ns-accent)] px-6 py-2.5 text-sm font-semibold text-[var(--ns-accent-contrast)] transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
+                >
+                    Start a {{ (int) $result['card']->timer_minutes }}-minute Timer
+                </button>
+            @endif
+
+            <button
+                x-show="!cardDone"
+                wire:click="markDone"
+                class="rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] px-6 py-2.5 text-sm font-medium text-[var(--ns-text)] transition hover:bg-[var(--ns-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
+            >
+                Mark this Card Done
+            </button>
+
+            <span x-show="cardDone" x-cloak class="text-sm font-medium text-[var(--ns-accent)]">
+                Done ✓
+            </span>
+
+            <button
+                wire:click="resetDraw"
+                class="rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] px-6 py-2.5 text-sm font-medium text-[var(--ns-text)] transition hover:bg-[var(--ns-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
+            >
+                Draw Another Card
+            </button>
+        </div>
+    </div>
+
+    {{-- ── TIMER REMINDER ──────────────────────────────────────────────── --}}
+    <div
+        x-show="reminder"
+        x-cloak
+        x-ref="reminderPanel"
+        role="status"
+        tabindex="-1"
+        class="ns-card-reminder mt-8"
+    >
+        @if ($result)
+            <p class="text-sm font-semibold text-[var(--ns-text)]">
+                ⏰ Time for: {{ $result['card']->name }}
+            </p>
+            <p class="mt-1 text-sm text-[var(--ns-text)]">
+                {{ $result['card']->description }}
+            </p>
+        @endif
+
+        <div class="mt-3 flex flex-wrap gap-3">
+            <button
+                wire:click="markDone"
+                class="rounded-lg bg-[var(--ns-accent)] px-4 py-2 text-sm font-semibold text-[var(--ns-accent-contrast)] transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
+            >
+                Mark this Card Done
+            </button>
+            <button
+                x-on:click="reminder = false"
+                class="rounded-lg border border-[var(--ns-border)] bg-[var(--ns-surface)] px-4 py-2 text-sm font-medium text-[var(--ns-text)] transition hover:bg-[var(--ns-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
+            >
+                Dismiss
+            </button>
+        </div>
     </div>
 </div>

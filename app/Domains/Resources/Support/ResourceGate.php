@@ -24,7 +24,7 @@ class ResourceGate
             return true;
         }
 
-        if (auth()->check()) {
+        if (auth()->check() && auth()->user()?->hasVerifiedEmail()) {
             return true;
         }
 

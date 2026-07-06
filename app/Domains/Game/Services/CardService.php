@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Game\Services;
 
 use App\Domains\Game\Models\Card;
 use App\Domains\Game\Models\UserCardPull;
+use App\Domains\Game\Models\XpEvent;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class CardService
@@ -25,13 +30,35 @@ class CardService
         $card = $eligible->random();
 
         $pull = $this->recordPull($user, $card);
-        $xpEvent = $this->xp->award($user, "card:{$deck}-{$card->name}", $card->xp_earned);
 
+        // XP is awarded on completion, not on draw — see complete().
         return [
             'card' => $card,
             'pull_count' => $pull->pull_count,
-            'xp_awarded' => $xpEvent?->amount ?? 0,
         ];
+    }
+
+    /**
+     * Award the card's XP once the player marks it done. Uses an atomic
+     * UPDATE WHERE completed_at IS NULL as the database-level guard so that
+     * concurrent Livewire requests carrying the same stale snapshot cannot
+     * both award XP. Returns null if the card was already completed this pull.
+     */
+    public function complete(User $user, Card $card): ?XpEvent
+    {
+        return DB::transaction(function () use ($user, $card) {
+            $updated = DB::table('user_card_pulls')
+                ->where('user_id', $user->id)
+                ->where('card_id', $card->id)
+                ->whereNull('completed_at')
+                ->update(['completed_at' => now()]);
+
+            if ($updated === 0) {
+                return null;
+            }
+
+            return $this->xp->award($user, "card:{$card->deck}-{$card->name}", $card->xp_earned);
+        });
     }
 
     public function pullCountsForUser(User $user, string $deck): Collection
@@ -67,12 +94,26 @@ class CardService
 
     private function recordPull(User $user, Card $card): UserCardPull
     {
-        $pull = UserCardPull::firstOrCreate(
-            ['user_id' => $user->id, 'card_id' => $card->id],
-            ['pull_count' => 0]
-        );
+        $keys = ['user_id' => $user->id, 'card_id' => $card->id];
 
-        $pull->increment('pull_count', 1, ['last_pulled_at' => now()]);
+        try {
+            return DB::transaction(fn () => $this->lockAndIncrement($keys));
+        } catch (UniqueConstraintViolationException) {
+            // A concurrent first-draw won the INSERT race; the row now exists,
+            // so re-run the locked increment against the existing row.
+            return DB::transaction(fn () => $this->lockAndIncrement($keys));
+        }
+    }
+
+    /**
+     * @param  array{user_id: int, card_id: int}  $keys
+     */
+    private function lockAndIncrement(array $keys): UserCardPull
+    {
+        $pull = UserCardPull::where($keys)->lockForUpdate()->first()
+            ?? UserCardPull::create([...$keys, 'pull_count' => 0]);
+
+        $pull->increment('pull_count', 1, ['last_pulled_at' => now(), 'completed_at' => null]);
 
         return $pull->fresh();
     }

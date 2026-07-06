@@ -62,7 +62,7 @@ Accessibility is a first-class requirement for this NeuroDivergent audience, not
 - All interactive elements must be keyboard-operable (`<button>`, not `<div onclick>`).
 - Focus must be managed explicitly on dynamic content changes (see `heading.focus()` in `adventure.js`).
 - Screen reader announcements via `aria-live="polite"` for dynamic updates; never `assertive` unless urgent.
-- No timers, autoplay, or time pressure anywhere.
+- No *imposed* timers, autoplay, or time pressure. The one exception is the Card game's opt-in timer: it is player-started, optional, silent, and carries no penalty — a gentle self-care reminder, never a countdown to failure. Any future timer must meet that same bar.
 - Theme tokens come from CSS custom properties in `resources/css/accessibility.css` — use `var(--ns-*)` rather than hardcoded colours.
 - The four themes (`low-stimulation` is the calm default) must all remain coherent after any CSS change.
 
@@ -73,3 +73,5 @@ All user-facing prose follows **Capitalize Key Terms** — product names, featur
 ## Story / game content
 
 The Adventure story lives in `resources/adventure/story.json`. Run `php artisan tinker` → `(new App\Domains\Game\Support\Story)->validate()` to catch broken scene links before committing. See `docs/adventure-authoring.md` for the scene schema.
+
+Card game cards (`cards` table, seeded by `CardSeeder`) may set an optional `timer_minutes`. When present, the drawn card offers a player-started "Start a N-minute timer" button; leave it `null` for cards with no time element. XP (`xp_earned`) is granted on **completion** (marking the card done or checking its last subtask), not on draw.

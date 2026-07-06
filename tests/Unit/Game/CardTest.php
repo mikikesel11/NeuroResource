@@ -52,4 +52,19 @@ class CardTest extends TestCase
         $this->assertIsBool($card->is_active);
         $this->assertTrue($card->is_active);
     }
+
+    public function test_timer_minutes_is_fillable_and_cast_to_integer(): void
+    {
+        $card = Card::create([
+            'name' => 'Timed Card',
+            'description' => 'A card.',
+            'deck' => 'focus',
+            'xp_earned' => 10,
+            'is_active' => true,
+            'timer_minutes' => 20,
+        ]);
+
+        $this->assertIsInt($card->fresh()->timer_minutes);
+        $this->assertSame(20, $card->fresh()->timer_minutes);
+    }
 }

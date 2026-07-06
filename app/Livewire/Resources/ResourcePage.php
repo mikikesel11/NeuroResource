@@ -53,8 +53,11 @@ class ResourcePage extends Component
             'resource_id' => $resource->id,
             'user_id' => auth()->id(),
             'email' => $data['email'],
-            'token' => Str::random(40),
         ]);
+        $unlock->token = Str::random(40);
+        $unlock->save();
+
+        RateLimiter::hit($this->throttleKey($data['email']), $this->decaySeconds());
 
         RateLimiter::hit($this->throttleKey($data['email']), $this->decaySeconds());
 
