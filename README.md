@@ -144,8 +144,13 @@ every pull request and on pushes to `main`.
 
 ## Documentation
 
-- [docs/system-design.md](docs/system-design.md) — architecture, data model,
-  trade-offs
+- [docs/system-design.md](docs/system-design.md) — architecture, data model, trade-offs, security hardening
+- [docs/CODEMAPS/](docs/CODEMAPS/) — detailed architectural codemaps
+  - [INDEX.md](docs/CODEMAPS/INDEX.md) — overview of all modules and recent changes
+  - [frontend.md](docs/CODEMAPS/frontend.md) — Livewire, Blade, themes, accessibility
+  - [backend.md](docs/CODEMAPS/backend.md) — controllers, services, models, API routes
+  - [database.md](docs/CODEMAPS/database.md) — schema, models, relationships
+  - [security.md](docs/CODEMAPS/security.md) — security headers, email-gate hardening, validation
 - [docs/writing-style.md](docs/writing-style.md) — the Capitalize Key Terms voice
 - [docs/adventure-authoring.md](docs/adventure-authoring.md) — authoring the game
 - [DEPLOYMENT.md](DEPLOYMENT.md) — deployment & operations
@@ -154,11 +159,18 @@ every pull request and on pushes to `main`.
 
 ## Status & roadmap
 
-Built and working: accessible public site, Shop catalogue, Resource Library
-(double opt-in), Blog + RSS, About, the Adventure (with cross-device save and
-subdomain support), accounts, and CI.
+**Built and working (v1.6, Jul 2026):**
+- Accessible public site with four user themes (light, dark, high-contrast, low-stimulation)
+- Shop catalog (headless Shopify + local fixture mode)
+- Resource Library (free + email-gated downloads with double opt-in, throttled, signed links)
+- Blog + RSS with tag filtering
+- About page (bio + certifications with credential URL validation)
+- The Adventure game (click-through story with cross-device save, subdomain support)
+- Accounts (Laravel Breeze auth with email verification)
+- Security hardening: HTTP headers, HTML sanitization, strict types
+- CI/CD pipeline (GitHub Actions: tests, Pint, asset build)
 
-Planned next:
+**Planned next:**
 
 - Cart + Shopify hosted checkout
 - Mailing-list provider sync for confirmed opt-ins

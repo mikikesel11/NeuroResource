@@ -1,6 +1,8 @@
 # NeuroResource — System Design
 
-Status: Draft v1 · Owner: mikikesel11 · Date: 2026-06-26
+Status: Draft v1 (Last Updated 2026-07-06) · Owner: mikikesel11
+
+**Recent Updates (v1.6):** Security hardening (#30–#34): HTTP headers, email-gate throttling + signed links, HTML sanitization, strict types, dead auth scaffolding removal.
 
 A site for **NeuroDivergent** people: a **Shop**, a **Blog**, a **Resource
 Library** for distribution, an **About** section for the featured person, and a
@@ -279,7 +281,30 @@ for sync. No Admin API write access needed for the storefront use case.
 - **v1 scope:** wire the structure and middleware, ship English only. No
   translation work required until content is ready.
 
-## 8. Subdomains & Environments
+## 8. Security & Privacy (v1.6 Hardening)
+
+### HTTP Headers
+- **X-Content-Type-Options: nosniff** — prevents MIME-sniffing attacks
+- **Referrer-Policy: strict-origin-when-cross-origin** — **critical for email-gate** to prevent token leakage via Referer header on cross-origin requests
+- **Permissions-Policy: camera=(), microphone=(), geolocation=()** — opt out of unused browser APIs
+
+### Email-Gate Hardening
+- **Rate limiting** per IP + email (default 3 attempts / 1 hour) to stop mail-bombing
+- **Signed + expiring confirmation links** via `URL::temporarySignedRoute` (default 24 hours)
+- **Mass-assignment protection:** `access` and `download_count` columns guarded (never settable from request)
+- **Session de-duplication:** first confirmation only (revisiting link does nothing)
+
+### Content Validation
+- **Credential URLs:** mutator rejects non-http(s) schemes, stores null; Blade guard as defense-in-depth
+- **Markdown HTML:** two-pass sanitization (CommonMark strip + tgalopin/html-sanitizer strict whitelist)
+
+### Code Quality
+- **Type safety:** `declare(strict_types=1)` across app/ (strict typing catches accidental coercions)
+- **Email verification required:** resource gate checks `hasVerifiedEmail()` (unverified users treated as anonymous)
+
+See [docs/CODEMAPS/security.md](CODEMAPS/security.md) for full details on all hardening.
+
+## 8a. Subdomains & Environments
 
 - `neuroresource.org` — main Laravel app.
 - `play.neuroresource.org` — static Adventure SPA (separate deploy, CDN).
@@ -334,3 +359,15 @@ script tag, no PII, no cross-site tracking — fully on-brand for this audience.
 | Content | First-party DB (not WP) | Full markup/a11y control; we build the (small) admin. |
 | Game | Separate static SPA | Cheap scaling + isolation; second codebase/deploy to maintain. |
 | Infra | Stateless app from day one | A little more setup now; horizontal scaling needs no rewrite later. |
+
+---
+
+## Architecture Codemaps
+
+For implementation details, module structure, and data flows, see:
+
+- **[CODEMAPS/INDEX.md](CODEMAPS/INDEX.md)** — overview of all codemaps and recent changes
+- **[CODEMAPS/frontend.md](CODEMAPS/frontend.md)** — Livewire components, Blade, themes, accessibility engine
+- **[CODEMAPS/backend.md](CODEMAPS/backend.md)** — controllers, services, models, routes, API
+- **[CODEMAPS/database.md](CODEMAPS/database.md)** — complete schema, models, relationships
+- **[CODEMAPS/security.md](CODEMAPS/security.md)** — headers, email-gate hardening, validation, sanitization

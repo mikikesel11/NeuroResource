@@ -165,11 +165,26 @@ Verify after deploy:
 
 ## 8. Security
 
+### Foundation
 - `APP_DEBUG=false`, a strong unique `APP_KEY`, HTTPS everywhere.
 - `SESSION_SECURE_COOKIE=true`; set `SESSION_DOMAIN` as above for the split.
 - Configure `TrustProxies` if behind a load balancer/CDN so HTTPS + client IPs
   are detected correctly.
 - Secrets (`APP_KEY`, Shopify/mail keys) come from the environment, never the repo.
+
+### Email-Gate Hardening (v1.6)
+- **Rate limiting:** default 3 unlock attempts per IP+email per 1 hour. Customize via:
+  - `RESOURCE_GATE_MAX_ATTEMPTS` (default 3)
+  - `RESOURCE_GATE_DECAY_MINUTES` (default 60)
+- **Signed + expiring confirmation links:** default 24 hours. Set `RESOURCE_UNLOCK_LINK_TTL_HOURS` to adjust.
+- All settings in `config/neuroresource.php`.
+
+### HTTP Security Headers (v1.6)
+- `X-Content-Type-Options: nosniff` (MIME-sniffing defense)
+- `Referrer-Policy: strict-origin-when-cross-origin` (protects email-gate tokens in query strings)
+- `Permissions-Policy: camera=(), microphone=(), geolocation()` (disables unused browser APIs)
+
+All applied globally by `SecurityHeaders` middleware. See [docs/CODEMAPS/security.md](docs/CODEMAPS/security.md) for details.
 
 ---
 
