@@ -22,10 +22,7 @@
                 <section aria-labelledby="bio-heading" class="mt-10">
                     <h2 id="bio-heading" class="text-xl font-semibold">Biography</h2>
                     <div class="ns-prose mt-4 space-y-4 text-[var(--ns-text)]">
-                        {!! \Illuminate\Support\Str::markdown($profile->bio, [
-                            'html_input' => 'strip',
-                            'allow_unsafe_links' => false,
-                        ]) !!}
+                        {!! safe_markdown($profile->bio) !!}
                     </div>
                 </section>
             @endif
@@ -59,7 +56,7 @@
                                     </p>
                                 @endif
 
-                                @if ($cert->credential_url)
+                                @if ($cert->credential_url && str_starts_with(strtolower($cert->credential_url), 'http'))
                                     <p class="mt-3">
                                         <a href="{{ $cert->credential_url }}" target="_blank" rel="noopener noreferrer"
                                            class="text-[var(--ns-accent)] underline underline-offset-4">
