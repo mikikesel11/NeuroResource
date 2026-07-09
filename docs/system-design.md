@@ -296,7 +296,7 @@ for sync. No Admin API write access needed for the storefront use case.
 
 ### Content Validation
 - **Credential URLs:** mutator rejects non-http(s) schemes, stores null; Blade guard as defense-in-depth
-- **Markdown HTML:** two-pass sanitization (CommonMark strip + tgalopin/html-sanitizer strict whitelist)
+- **Markdown HTML:** two-pass sanitization (CommonMark strip + symfony/html-sanitizer strict whitelist)
 
 ### Code Quality
 - **Type safety:** `declare(strict_types=1)` across app/ (strict typing catches accidental coercions)

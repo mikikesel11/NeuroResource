@@ -89,7 +89,7 @@ Backend (Laravel 13 + Modular Monolith)
 │  └─ [See frontend.md — act as mini-controllers for interactive pages]
 │
 ├─ Utilities (app/Support/)
-│  └─ SafeMarkdown.php          (#31) CommonMark + tgalopin/html-sanitizer
+│  └─ SafeMarkdown.php          (#31) CommonMark + symfony/html-sanitizer
 │
 ├─ Routes (routes/)
 │  ├─ web.php                   Public routes (Blade + Livewire pages)
@@ -208,7 +208,7 @@ Player in JavaScript engine (adventure.js)
 - **Blade guard** in about.blade.php: str_starts_with check before href attribute
 
 ### HTML Sanitization (#31)
-- **SafeMarkdown helper**: CommonMark (html_input: strip) + tgalopin/html-sanitizer
+- **SafeMarkdown helper**: CommonMark (html_input: strip) + symfony/html-sanitizer
 - Used in blog/show and profile/about to prevent XSS on Markdown-rendered content
 
 ### Type Safety (#32)

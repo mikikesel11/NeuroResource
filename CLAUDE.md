@@ -45,7 +45,7 @@ Tests run against SQLite in-memory (configured in `phpunit.xml`). Use `Carbon::s
 **Recent Security Hardening (v1.6, Jul 6):**
 - HTTP headers: X-Content-Type-Options, Referrer-Policy (protects email-gate tokens), Permissions-Policy
 - Email-gate: rate limiting per IP+email, signed+expiring links, mass-assignment protection, session de-dup
-- HTML sanitization: `safe_markdown()` helper (CommonMark + tgalopin/html-sanitizer)
+- HTML sanitization: `safe_markdown()` helper (CommonMark + symfony/html-sanitizer)
 - URL validation: credential_url rejects non-http(s) schemes
 - Type safety: `declare(strict_types=1)` across codebase
 - Removed dead auth scaffolding (GuestLayout, layouts/guest.blade.php, auth-session-status component, @tailwindcss/vite)

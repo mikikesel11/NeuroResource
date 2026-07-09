@@ -39,7 +39,7 @@ app/
 
 **Added:**
 - **SecurityHeaders middleware** (#30): X-Content-Type-Options, Referrer-Policy (protects email-gate tokens), Permissions-Policy
-- **SafeMarkdown helper** (#31): CommonMark + tgalopin/html-sanitizer (two-pass XSS defense)
+- **SafeMarkdown helper** (#31): CommonMark + symfony/html-sanitizer (two-pass XSS defense)
 - **Credential URL validation** (#31): Attribute mutator rejects non-http(s) URLs, Blade guard ensures safety
 - **Email-gate hardening** (#33):
   - Rate limiting per IP + email on unlock endpoint (config-driven, friendly throttle notices)
