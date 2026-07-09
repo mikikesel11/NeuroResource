@@ -23,7 +23,7 @@ Security Layers
 │
 ├─ URL & Content Validation (#31)
 │  ├─ Certification credential_url: http(s) only
-│  └─ SafeMarkdown: CommonMark + tgalopin/html-sanitizer
+│  └─ SafeMarkdown: CommonMark + symfony/html-sanitizer
 │
 └─ Type Safety (#32)
    └─ declare(strict_types=1) across app/
@@ -312,7 +312,7 @@ function safe_markdown(string $content): string
         'allow_unsafe_links' => false,     // No javascript: or data: URLs
     ]);
 
-    // Pass 2: Sanitize via tgalopin/html-sanitizer (strict whitelist)
+    // Pass 2: Sanitize via symfony/html-sanitizer (strict whitelist)
     $sanitizer = Sanitizer::create([
         'extensions' => ['basic', 'code', 'image', 'list', 'table', 'extra'],
     ]);
@@ -480,7 +480,7 @@ Consider adding:
 | Package | Purpose | Security Notes |
 |---------|---------|-----------------|
 | laravel/breeze | Auth (registration, login, email verify) | Battle-tested; keep updated |
-| tgalopin/html-sanitizer | XSS defense | Strict whitelist; no bypass known |
+| symfony/html-sanitizer | XSS defense | Strict whitelist; no bypass known |
 | shopify/storefront-api-client | Shopify integration | Token-based; never store webhook data |
 | plausible/analytics | Privacy-first analytics | Cookieless; no consent banner needed |
 

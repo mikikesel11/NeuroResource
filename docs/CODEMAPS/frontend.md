@@ -135,7 +135,7 @@ All Livewire & Blade components verified to use public-layout only.
 
 ### #31 — HTML Sanitization in Markdown
 **Added:**
-- `app/Support/SafeMarkdown.php` helper (two-pass: CommonMark + tgalopin/html-sanitizer)
+- `app/Support/SafeMarkdown.php` helper (two-pass: CommonMark + symfony/html-sanitizer)
 - Replaces bare `Str::markdown()` calls in:
   - `livewire/blog/show.blade.php`
   - `livewire/profile/about.blade.php`
@@ -172,7 +172,7 @@ PostCSS config: `postcss.config.js`
 | livewire/volt | 1.x | Single-file PHP components |
 | tailwindcss | 3.x | Utility CSS framework |
 | @headlessui/tailwindcss | — | Accessible UI primitives |
-| tgalopin/html-sanitizer | Latest | XSS defense (two-pass with CommonMark) |
+| symfony/html-sanitizer | Latest | XSS defense (two-pass with CommonMark) |
 
 ## Related Areas
 
