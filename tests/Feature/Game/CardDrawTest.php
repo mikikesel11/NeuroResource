@@ -20,6 +20,9 @@ class CardDrawTest extends TestCase
         parent::setUp();
 
         config(['neuroresource.decks.focus' => [
+            'title' => 'Focus',
+            'prompt' => 'Help getting started',
+            'access' => 'free',
             'back_image' => 'images/cards/focus/back.jpg',
             'bg' => 'from-blue-50 to-blue-100',
             'accent' => 'text-blue-800',

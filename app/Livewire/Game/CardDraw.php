@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Game;
 
 use App\Domains\Game\Services\CardService;
+use App\Domains\Game\Support\DeckAccess;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -25,7 +26,7 @@ class CardDraw extends Component
 
     public function mount(string $deck): void
     {
-        abort_unless(config("neuroresource.decks.{$deck}"), 404);
+        abort_unless(DeckAccess::allows(auth()->user(), $deck), 404);
 
         $this->deck = $deck;
         $this->deckTheme = config("neuroresource.decks.{$deck}", [

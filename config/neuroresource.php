@@ -82,18 +82,27 @@ return [
 
     'decks' => [
         'focus' => [
+            'title' => 'Focus',
+            'prompt' => 'Help getting started',
+            'access' => 'free',
             'back_image' => 'images/cards/focus/back.jpg',
             'bg' => 'from-blue-50 to-blue-100',
             'accent' => 'text-blue-800',
             'border' => 'border-blue-200',
         ],
         'calm' => [
+            'title' => 'Calm',
+            'prompt' => 'A moment to settle',
+            'access' => 'free',
             'back_image' => 'images/cards/calm/back.jpg',
             'bg' => 'from-green-50 to-teal-100',
             'accent' => 'text-teal-800',
             'border' => 'border-teal-200',
         ],
         'brave' => [
+            'title' => 'Brave',
+            'prompt' => 'A little courage',
+            'access' => 'free',
             'back_image' => 'images/cards/brave/back.jpg',
             'bg' => 'from-amber-50 to-orange-100',
             'accent' => 'text-orange-800',
