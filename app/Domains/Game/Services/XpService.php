@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domains\Game\Services;
 
+use App\Domains\Game\Models\DailyLoginBonus;
 use App\Domains\Game\Models\XpEvent;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 class XpService
@@ -18,6 +20,16 @@ class XpService
     public const MIN_AWARD = 0;
 
     public const MAX_AWARD = 65535;
+
+    /**
+     * Must match the `source` column width in xp_events. Card.name and
+     * Card.deck are themselves bounded so a composed "card:{deck}-{name}"
+     * source always fits here (see the cards/xp_events migrations) — this
+     * truncation is a defense-in-depth backstop, not the primary guard,
+     * so the ledger can never throw or silently corrupt under strict SQL
+     * mode even if that invariant is ever violated.
+     */
+    private const MAX_SOURCE_LENGTH = 160;
 
     public function award(User $user, string $source, int $amount, ?Carbon $awardedAt = null): ?XpEvent
     {
@@ -31,9 +43,10 @@ class XpService
         }
 
         $awardedAt ??= Carbon::now();
+        $source = mb_substr($source, 0, self::MAX_SOURCE_LENGTH);
 
-        if ($source === 'daily_login' && $this->hasDailyBonus($user, $awardedAt)) {
-            return null;
+        if ($source === 'daily_login') {
+            return $this->awardDailyLoginBonus($user, $awardedAt, $amount);
         }
 
         return XpEvent::create([
@@ -44,12 +57,33 @@ class XpService
         ]);
     }
 
-    public function hasDailyBonus(User $user, Carbon $date): bool
+    /**
+     * The unique constraint on daily_login_bonuses(user_id, awarded_date) is
+     * the atomic guard against double-awarding. A check-then-insert here
+     * would race under concurrent requests (e.g. two tabs logging in at
+     * once), and xp_events is append-only so a duplicate could never be
+     * cleaned up after the fact. Mirrors the retry-on-conflict pattern in
+     * CardService::recordPull().
+     */
+    private function awardDailyLoginBonus(User $user, Carbon $awardedAt, int $amount): ?XpEvent
     {
-        return XpEvent::where('user_id', $user->id)
-            ->where('source', 'daily_login')
-            ->whereDate('awarded_at', $date->toDateString())
-            ->exists();
+        try {
+            return DB::transaction(function () use ($user, $awardedAt, $amount) {
+                DailyLoginBonus::create([
+                    'user_id' => $user->id,
+                    'awarded_date' => $awardedAt->toDateString(),
+                ]);
+
+                return XpEvent::create([
+                    'user_id' => $user->id,
+                    'source' => 'daily_login',
+                    'amount' => $amount,
+                    'awarded_at' => $awardedAt,
+                ]);
+            });
+        } catch (UniqueConstraintViolationException) {
+            return null;
+        }
     }
 
     public function dailyTotal(User $user, ?Carbon $date = null): int

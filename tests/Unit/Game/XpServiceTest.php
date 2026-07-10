@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Game;
 
+use App\Domains\Game\Models\DailyLoginBonus;
 use App\Domains\Game\Models\XpEvent;
 use App\Domains\Game\Services\XpService;
 use App\Models\User;
@@ -143,6 +144,39 @@ class XpServiceTest extends TestCase
         $this->assertNotNull($first);
         $this->assertNull($second);
         $this->assertDatabaseCount('xp_events', 1);
+    }
+
+    public function test_award_returns_null_when_daily_bonus_already_reserved_concurrently(): void
+    {
+        // Simulates a concurrent request winning the race: it has already
+        // reserved today's slot via the unique constraint before this call
+        // runs, so the DB-level guard — not a check-then-insert — must be
+        // what stops the duplicate.
+        Carbon::setTestNow('2026-01-15');
+        $user = User::factory()->create();
+
+        DailyLoginBonus::create([
+            'user_id' => $user->id,
+            'awarded_date' => Carbon::now()->toDateString(),
+        ]);
+
+        $result = $this->service->award($user, 'daily_login', 10);
+
+        $this->assertNull($result);
+        $this->assertDatabaseCount('xp_events', 0);
+        $this->assertDatabaseCount('daily_login_bonuses', 1);
+    }
+
+    public function test_award_truncates_oversized_source_instead_of_failing(): void
+    {
+        $user = User::factory()->create();
+        $overlongSource = 'card:'.str_repeat('x', 200);
+
+        $event = $this->service->award($user, $overlongSource, 5);
+
+        $this->assertNotNull($event);
+        $this->assertLessThanOrEqual(160, mb_strlen($event->source));
+        $this->assertSame(mb_substr($overlongSource, 0, 160), $event->source);
     }
 
     public function test_level_increases_every_100_xp(): void

@@ -11,7 +11,10 @@ return new class extends Migration
         Schema::create('xp_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('source', 64);
+            // 160 covers the worst case "card:{deck}-{name}" (deck <= 64, name <= 80,
+            // see cards migration) with headroom, while staying under MySQL's safe
+            // indexed-varchar width for utf8mb4.
+            $table->string('source', 160);
             $table->unsignedSmallInteger('amount')->default(10);
             $table->timestamp('awarded_at')->useCurrent();
             $table->json('meta')->nullable();
