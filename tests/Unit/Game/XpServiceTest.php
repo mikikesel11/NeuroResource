@@ -170,13 +170,13 @@ class XpServiceTest extends TestCase
     public function test_award_truncates_oversized_source_instead_of_failing(): void
     {
         $user = User::factory()->create();
-        $overlongSource = 'card:'.str_repeat('x', 100);
+        $overlongSource = 'card:'.str_repeat('x', 200);
 
         $event = $this->service->award($user, $overlongSource, 5);
 
         $this->assertNotNull($event);
-        $this->assertLessThanOrEqual(64, mb_strlen($event->source));
-        $this->assertSame(mb_substr($overlongSource, 0, 64), $event->source);
+        $this->assertLessThanOrEqual(160, mb_strlen($event->source));
+        $this->assertSame(mb_substr($overlongSource, 0, 160), $event->source);
     }
 
     public function test_level_increases_every_100_xp(): void

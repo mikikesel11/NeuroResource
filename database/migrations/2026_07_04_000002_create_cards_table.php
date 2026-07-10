@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            // Bounded so "card:{deck}-{name}" always fits xp_events.source (see that migration).
+            $table->string('name', 80);
             $table->text('description');
             $table->string('deck', 64);
             $table->unsignedSmallInteger('xp_earned')->default(10);

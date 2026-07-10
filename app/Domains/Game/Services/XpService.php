@@ -22,13 +22,14 @@ class XpService
     public const MAX_AWARD = 65535;
 
     /**
-     * Must match the `source` column width in xp_events. Sources are
-     * truncated to this length before insert so a long composed string
-     * (e.g. "card:{deck}-{name}" with an oversized card name) can never
-     * throw or silently corrupt the append-only ledger under strict SQL
-     * mode.
+     * Must match the `source` column width in xp_events. Card.name and
+     * Card.deck are themselves bounded so a composed "card:{deck}-{name}"
+     * source always fits here (see the cards/xp_events migrations) — this
+     * truncation is a defense-in-depth backstop, not the primary guard,
+     * so the ledger can never throw or silently corrupt under strict SQL
+     * mode even if that invariant is ever violated.
      */
-    private const MAX_SOURCE_LENGTH = 64;
+    private const MAX_SOURCE_LENGTH = 160;
 
     public function award(User $user, string $source, int $amount, ?Carbon $awardedAt = null): ?XpEvent
     {
