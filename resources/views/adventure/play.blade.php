@@ -21,6 +21,17 @@
                 </p>
             </noscript>
         </div>
+
+        @auth
+        <div class="mt-8 border-t border-[var(--ns-border)] pt-8">
+            <a
+                href="{{ route('cards.questionnaire') }}"
+                class="inline-flex items-center rounded-lg bg-[var(--ns-accent)] px-6 py-3 font-semibold text-[var(--ns-accent-contrast)] transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ns-focus)]"
+            >
+                Draw a Card from a Deck
+            </a>
+        </div>
+        @endauth
     </section>
 
     {{-- Story data island, read by the engine. --}}
